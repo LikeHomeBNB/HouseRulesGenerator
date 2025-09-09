@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Home, Settings, FileText, Download, Car, Waves, TreePine, Users, Clock } from 'lucide-react';
+import { Home, Settings, FileText, Download, Car, Waves, TreePine, Users, Clock, Plus, Trash2, Edit2 } from 'lucide-react';
 
 const HausregelnGenerator = () => {
   // CSS Custom Properties für LikeHome-Farben
@@ -11,8 +11,8 @@ const HausregelnGenerator = () => {
     white: '#FFFFFF'        // White
   };
 
-  // Demo-Wohnungen
-  const [wohnungen] = useState([
+  // Wohnungen State - jetzt editierbar
+  const [wohnungen, setWohnungen] = useState([
     { id: 1, nummer: '101', name: 'Erdgeschoss Links' },
     { id: 2, nummer: '102', name: 'Erdgeschoss Rechts' },
     { id: 3, nummer: '201', name: '1. OG Links' },
@@ -21,6 +21,12 @@ const HausregelnGenerator = () => {
     { id: 6, nummer: '302', name: '2. OG Rechts' },
     { id: 7, nummer: '305', name: '2. OG Penthouse' }
   ]);
+
+  // State für neue Wohnung
+  const [neueWohnung, setNeueWohnung] = useState({ nummer: '', name: '' });
+  const [editMode, setEditMode] = useState(null);
+  const [editData, setEditData] = useState({});
+  const [showApartmentManager, setShowApartmentManager] = useState(false);
 
   // Einheitliche Regeln (für alle gleich)
   const [einheitlicheRegeln, setEinheitlicheRegeln] = useState({
@@ -68,6 +74,56 @@ const HausregelnGenerator = () => {
   });
 
   const [activeTab, setActiveTab] = useState('konfigurator');
+
+  // Apartment Management Functions
+  const addWohnung = () => {
+    if (neueWohnung.nummer && neueWohnung.name) {
+      const newId = Math.max(...wohnungen.map(w => w.id), 0) + 1;
+      const newWohnung = { ...neueWohnung, id: newId };
+      
+      setWohnungen([...wohnungen, newWohnung]);
+      
+      // Add default values for the new apartment in variable rules
+      setVariableRegeln(prev => ({
+        parkplaetze: { ...prev.parkplaetze, [newId]: 1 },
+        pool: { ...prev.pool, [newId]: false },
+        garten: { ...prev.garten, [newId]: 'gemeinschaft' }
+      }));
+      
+      setNeueWohnung({ nummer: '', name: '' });
+    }
+  };
+
+  const deleteWohnung = (id) => {
+    setWohnungen(wohnungen.filter(w => w.id !== id));
+    
+    // Remove from variable rules
+    setVariableRegeln(prev => {
+      const newRules = { ...prev };
+      delete newRules.parkplaetze[id];
+      delete newRules.pool[id];
+      delete newRules.garten[id];
+      return newRules;
+    });
+  };
+
+  const startEdit = (wohnung) => {
+    setEditMode(wohnung.id);
+    setEditData({ nummer: wohnung.nummer, name: wohnung.name });
+  };
+
+  const updateWohnung = (id) => {
+    setWohnungen(wohnungen.map(w => 
+      w.id === id ? { ...w, ...editData } : w
+    ));
+    setEditMode(null);
+    setEditData({});
+  };
+
+  const cancelEdit = () => {
+    setEditMode(null);
+    setEditData({});
+  };
 
   // Gruppierungs-Funktionen
   const gruppiereNachWert = (regel) => {
@@ -334,6 +390,23 @@ Eine Verletzung dieser Hausordnung verstößt gegen die Mietbedingungen gemäß 
           borderBottom: `2px solid ${styles.light}`
         }}>
           <button
+            onClick={() => setActiveTab('apartments')}
+            style={{
+              padding: '12px 24px',
+              border: 'none',
+              borderBottom: `3px solid ${activeTab === 'apartments' ? styles.primary : 'transparent'}`,
+              backgroundColor: 'transparent',
+              color: activeTab === 'apartments' ? styles.primary : styles.secondary,
+              cursor: 'pointer',
+              fontFamily: 'Manrope, sans-serif',
+              fontSize: '16px',
+              fontWeight: '600'
+            }}
+          >
+            <Users size={20} style={{ marginRight: '8px', display: 'inline' }} />
+            Apartments
+          </button>
+          <button
             onClick={() => setActiveTab('konfigurator')}
             style={{
               padding: '12px 24px',
@@ -370,7 +443,189 @@ Eine Verletzung dieser Hausordnung verstößt gegen die Mietbedingungen gemäß 
         </div>
 
         {/* Content */}
-        {activeTab === 'konfigurator' ? (
+        {activeTab === 'apartments' ? (
+          <div>
+            {/* Apartment Manager */}
+            <div style={{
+              backgroundColor: styles.white,
+              padding: '24px',
+              borderRadius: '12px',
+              marginBottom: '32px',
+              border: `2px solid ${styles.primary}`
+            }}>
+              <h2 style={{ 
+                margin: '0 0 20px 0',
+                color: styles.dark,
+                fontSize: '24px',
+                display: 'flex',
+                alignItems: 'center'
+              }}>
+                <Users size={28} style={{ marginRight: '12px', color: styles.primary }} />
+                Apartment-Verwaltung ({wohnungen.length} Apartments)
+              </h2>
+
+              {/* Add new apartment */}
+              <div style={{
+                backgroundColor: styles.light,
+                padding: '20px',
+                borderRadius: '8px',
+                marginBottom: '24px'
+              }}>
+                <h3 style={{ margin: '0 0 16px 0', color: styles.dark }}>Neues Apartment hinzufügen</h3>
+                <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
+                  <input
+                    type="text"
+                    placeholder="Nummer (z.B. 101)"
+                    value={neueWohnung.nummer}
+                    onChange={(e) => setNeueWohnung(prev => ({ ...prev, nummer: e.target.value }))}
+                    style={{
+                      padding: '8px 12px',
+                      border: `1px solid ${styles.secondary}`,
+                      borderRadius: '4px',
+                      minWidth: '120px'
+                    }}
+                  />
+                  <input
+                    type="text"
+                    placeholder="Name (z.B. Erdgeschoss Links)"
+                    value={neueWohnung.name}
+                    onChange={(e) => setNeueWohnung(prev => ({ ...prev, name: e.target.value }))}
+                    style={{
+                      padding: '8px 12px',
+                      border: `1px solid ${styles.secondary}`,
+                      borderRadius: '4px',
+                      minWidth: '200px',
+                      flex: '1'
+                    }}
+                  />
+                  <button
+                    onClick={addWohnung}
+                    style={{
+                      padding: '8px 16px',
+                      backgroundColor: styles.primary,
+                      color: styles.white,
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px'
+                    }}
+                  >
+                    <Plus size={16} />
+                    Hinzufügen
+                  </button>
+                </div>
+              </div>
+
+              {/* Apartment List */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',
+                gap: '16px'
+              }}>
+                {wohnungen.map((wohnung) => (
+                  <div key={wohnung.id} style={{
+                    backgroundColor: styles.light,
+                    padding: '16px',
+                    borderRadius: '8px',
+                    border: `1px solid ${styles.secondary}`
+                  }}>
+                    {editMode === wohnung.id ? (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                        <input
+                          type="text"
+                          value={editData.nummer || ''}
+                          onChange={(e) => setEditData(prev => ({ ...prev, nummer: e.target.value }))}
+                          placeholder="Apartment Nummer"
+                          style={{
+                            padding: '8px 12px',
+                            border: `1px solid ${styles.secondary}`,
+                            borderRadius: '4px'
+                          }}
+                        />
+                        <input
+                          type="text"
+                          value={editData.name || ''}
+                          onChange={(e) => setEditData(prev => ({ ...prev, name: e.target.value }))}
+                          placeholder="Apartment Name"
+                          style={{
+                            padding: '8px 12px',
+                            border: `1px solid ${styles.secondary}`,
+                            borderRadius: '4px'
+                          }}
+                        />
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          <button
+                            onClick={() => updateWohnung(wohnung.id)}
+                            style={{
+                              padding: '6px 12px',
+                              backgroundColor: styles.primary,
+                              color: styles.white,
+                              border: 'none',
+                              borderRadius: '4px',
+                              cursor: 'pointer',
+                              fontSize: '14px'
+                            }}
+                          >
+                            Speichern
+                          </button>
+                          <button
+                            onClick={cancelEdit}
+                            style={{
+                              padding: '6px 12px',
+                              backgroundColor: styles.secondary,
+                              color: styles.white,
+                              border: 'none',
+                              borderRadius: '4px',
+                              cursor: 'pointer',
+                              fontSize: '14px'
+                            }}
+                          >
+                            Abbrechen
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                          <h4 style={{ margin: 0, color: styles.dark }}>Apartment {wohnung.nummer}</h4>
+                          <div style={{ display: 'flex', gap: '4px' }}>
+                            <button
+                              onClick={() => startEdit(wohnung)}
+                              style={{
+                                padding: '4px',
+                                backgroundColor: 'transparent',
+                                border: 'none',
+                                cursor: 'pointer',
+                                color: styles.primary
+                              }}
+                            >
+                              <Edit2 size={16} />
+                            </button>
+                            <button
+                              onClick={() => deleteWohnung(wohnung.id)}
+                              style={{
+                                padding: '4px',
+                                backgroundColor: 'transparent',
+                                border: 'none',
+                                cursor: 'pointer',
+                                color: '#dc2626'
+                              }}
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
+                        </div>
+                        <p style={{ margin: 0, color: styles.secondary, fontSize: '14px' }}>{wohnung.name}</p>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : activeTab === 'konfigurator' ? (
           <div>
             {/* Einheitliche Regeln */}
             <div style={{
