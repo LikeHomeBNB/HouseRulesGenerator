@@ -1,10 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import Example from './Example';
+import HausregelnGenerator from './homerules';
 import './index.css';
 
 function App() {
-  return <Example />;
+  return <HausregelnGenerator />;
 }
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
