@@ -58,7 +58,14 @@ const HausregelnGenerator = () => {
     gartenUnterschiedlich: true,
     gartenGlobal: 'gemeinschaft', // Wert wenn nicht unterschiedlich
     hundegebuehrUnterschiedlich: false,
-    hundegebuehrGlobal: 25 // Euro pro Aufenthalt
+    hundegebuehrGlobal: 25, // Euro pro Aufenthalt
+    // Überwachung & Datenschutz
+    lautstaerkemessung: true,
+    lautstaerkeSpeicherdauer: 30, // Tage
+    rauchdetektoren: true,
+    rauchdetektor_datenspeicherung: true,
+    kameras_gemeinschaftsbereiche: false,
+    kamera_standorte: 'Eingangsbereiche, Flure' // Text-Liste der Standorte
   });
 
   // Variable Regeln (pro Wohnung)
@@ -462,6 +469,31 @@ Der Gast haftet vollumfänglich für alle Kosten, Schäden und rechtlichen Konse
 
 ### d) Sperrung
 Bei Missbrauch behält sich der Vermieter das Recht vor, den WLAN-Zugang für den Gast zu sperren.
+
+## 🔍 Überwachung & Datenschutz
+
+### a) Datenschutzerklärung
+Die Datenverarbeitung erfolgt DSGVO-konform. Alle erhobenen Daten dienen ausschließlich der Sicherheit, dem Schutz des Eigentums und der Einhaltung der Hausordnung.
+
+${globalSettings.lautstaerkemessung ? `### b) Lautstärkemessung
+In den Wohnungen sind Geräte zur Lautstärkemessung installiert. Diese dienen der Überwachung der Einhaltung der Nachtruhe und Lärmschutzbestimmungen. Die Messdaten werden für ${globalSettings.lautstaerkeSpeicherdauer} Tage gespeichert und anschließend automatisch gelöscht.
+
+**Wichtiger Hinweis:** Es werden nur Lautstärkepegel gemessen, keine Gespräche aufgezeichnet.` : ''}
+
+${globalSettings.rauchdetektoren ? `### ${globalSettings.lautstaerkemessung ? 'c' : 'b'}) Rauchdetektoren
+Die Wohnungen sind mit Rauchdetektoren ausgestattet${globalSettings.rauchdetektor_datenspeicherung ? ', die Alarmereignisse mit Datum und Uhrzeit speichern' : ''}. Diese dienen dem Brandschutz und der Sicherheit aller Gäste.` : ''}
+
+${globalSettings.kameras_gemeinschaftsbereiche ? `### ${(globalSettings.lautstaerkemessung ? 1 : 0) + (globalSettings.rauchdetektoren ? 1 : 0) === 2 ? 'd' : (globalSettings.lautstaerkemessung || globalSettings.rauchdetektoren) ? 'c' : 'b'}) Videoüberwachung
+In folgenden Gemeinschaftsbereichen sind Überwachungskameras installiert: **${globalSettings.kamera_standorte}**.
+
+**Wichtige Hinweise:**
+- Es werden keine Privat- oder Wohnräume überwacht
+- Die Aufzeichnungen dienen der Sicherheit und dem Schutz des Eigentums
+- Aufbewahrungsdauer gemäß gesetzlichen Bestimmungen
+- Bei berechtigtem Interesse können Aufnahmen eingesehen werden` : ''}
+
+### ${['b', 'c', 'd', 'e'][(globalSettings.lautstaerkemessung ? 1 : 0) + (globalSettings.rauchdetektoren ? 1 : 0) + (globalSettings.kameras_gemeinschaftsbereiche ? 1 : 0)]}) Datenschutzrechte
+Gäste haben das Recht auf Auskunft, Berichtigung und Löschung ihrer personenbezogenen Daten gemäß DSGVO. Bei Fragen zum Datenschutz wenden Sie sich bitte an den Vermieter.
 
 ## 🕐 An- und Abreise
 
@@ -957,6 +989,109 @@ Eine Verletzung dieser Hausordnung verstößt gegen die Mietbedingungen gemäß 
                     )}
                   </div>
                 )}
+
+                {/* Überwachung & Datenschutz */}
+                <div style={{
+                  backgroundColor: '#FFF0F5',
+                  padding: '16px',
+                  borderRadius: '6px',
+                  border: `1px solid ${styles.secondary}`,
+                  gridColumn: 'span 2',
+                  marginTop: '16px'
+                }}>
+                  <h4 style={{ margin: '0 0 16px 0', color: styles.dark }}>🔍 Überwachung & Datenschutz</h4>
+                  
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+                    {/* Lautstärkemessung */}
+                    <div>
+                      <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', marginBottom: '8px' }}>
+                        <input
+                          type="checkbox"
+                          checked={globalSettings.lautstaerkemessung}
+                          onChange={(e) => updateGlobalSetting('lautstaerkemessung', e.target.checked)}
+                          style={{ marginRight: '8px' }}
+                        />
+                        <span style={{ fontWeight: '600' }}>Lautstärkemessung in Wohnungen</span>
+                      </label>
+                      {globalSettings.lautstaerkemessung && (
+                        <div style={{ marginLeft: '24px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <span>Speicherdauer:</span>
+                          <input
+                            type="number"
+                            value={globalSettings.lautstaerkeSpeicherdauer}
+                            onChange={(e) => updateGlobalSetting('lautstaerkeSpeicherdauer', parseInt(e.target.value) || 30)}
+                            style={{ 
+                              padding: '4px 8px', 
+                              border: `1px solid ${styles.secondary}`, 
+                              borderRadius: '4px',
+                              width: '60px'
+                            }}
+                            min="1"
+                            max="365"
+                          />
+                          <span>Tage</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Rauchdetektoren */}
+                    <div>
+                      <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', marginBottom: '8px' }}>
+                        <input
+                          type="checkbox"
+                          checked={globalSettings.rauchdetektoren}
+                          onChange={(e) => updateGlobalSetting('rauchdetektoren', e.target.checked)}
+                          style={{ marginRight: '8px' }}
+                        />
+                        <span style={{ fontWeight: '600' }}>Rauchdetektoren</span>
+                      </label>
+                      {globalSettings.rauchdetektoren && (
+                        <div style={{ marginLeft: '24px' }}>
+                          <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                            <input
+                              type="checkbox"
+                              checked={globalSettings.rauchdetektor_datenspeicherung}
+                              onChange={(e) => updateGlobalSetting('rauchdetektor_datenspeicherung', e.target.checked)}
+                              style={{ marginRight: '8px' }}
+                            />
+                            <span>Mit Datenspeicherung</span>
+                          </label>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Kameras */}
+                  <div>
+                    <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', marginBottom: '12px' }}>
+                      <input
+                        type="checkbox"
+                        checked={globalSettings.kameras_gemeinschaftsbereiche}
+                        onChange={(e) => updateGlobalSetting('kameras_gemeinschaftsbereiche', e.target.checked)}
+                        style={{ marginRight: '8px' }}
+                      />
+                      <span style={{ fontWeight: '600' }}>Kameras in Gemeinschaftsbereichen</span>
+                    </label>
+                    {globalSettings.kameras_gemeinschaftsbereiche && (
+                      <div style={{ marginLeft: '24px' }}>
+                        <label style={{ display: 'block', marginBottom: '4px', fontWeight: '500' }}>Standorte:</label>
+                        <textarea
+                          value={globalSettings.kamera_standorte}
+                          onChange={(e) => updateGlobalSetting('kamera_standorte', e.target.value)}
+                          placeholder="z.B. Eingangsbereiche, Flure, Gemeinschaftsgarten, Poolbereich"
+                          style={{ 
+                            padding: '8px', 
+                            border: `1px solid ${styles.secondary}`, 
+                            borderRadius: '4px',
+                            width: '100%',
+                            minHeight: '60px',
+                            resize: 'vertical'
+                          }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
 
