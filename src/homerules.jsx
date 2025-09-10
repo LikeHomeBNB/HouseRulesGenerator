@@ -34,6 +34,7 @@ const HausregelnGenerator = () => {
     nachtruheBis: '06:00',
     kinderGeeignet: true,
     rauchenErlaubt: false,
+    rauchenBalkonErlaubt: false,
     haustiereErlaubt: false,
     vermieeterName: 'LikeHome Service',
     vermieterTelefon: '+49 123 456789',
@@ -408,9 +409,12 @@ Bitte duschen Sie sich, bevor Sie den Pool betreten.
     output += `## 🚭 Rauchen
 
 ### a) Rauchregeln
-Das Rauchen ist ${einheitlicheRegeln.rauchenErlaubt ? 'in den Ferienwohnungen erlaubt' : 'in den Ferienwohnungen nicht erlaubt'}.
+Das Rauchen ist ${einheitlicheRegeln.rauchenErlaubt ? 'in den Ferienwohnungen erlaubt' : 'in den Ferienwohnungen nicht erlaubt'}${!einheitlicheRegeln.rauchenErlaubt && einheitlicheRegeln.rauchenBalkonErlaubt ? ', jedoch auf Balkonen/Terrassen gestattet' : ''}.
 
-### b) Entsorgung
+### b) Vertragsstrafe
+Bei Verstoß gegen das Rauchverbot wird eine Vertragsstrafe von **200€** für die erforderliche Sonderreinigung erhoben. Dies erfolgt zusätzlich zu eventuellen Schadensersatzforderungen.
+
+### c) Entsorgung
 Zigarettenstummel müssen ordnungsgemäß entsorgt werden und dürfen nicht auf das Grundstück geworfen werden. Nichtbeachtung führt zu Bußgeld/Abzug der Kaution.
 
 ## 🐕 Haustiere
@@ -494,6 +498,35 @@ In folgenden Gemeinschaftsbereichen sind Überwachungskameras installiert: **${g
 
 ### ${['b', 'c', 'd', 'e'][(globalSettings.lautstaerkemessung ? 1 : 0) + (globalSettings.rauchdetektoren ? 1 : 0) + (globalSettings.kameras_gemeinschaftsbereiche ? 1 : 0)]}) Datenschutzrechte
 Gäste haben das Recht auf Auskunft, Berichtigung und Löschung ihrer personenbezogenen Daten gemäß DSGVO. Bei Fragen zum Datenschutz wenden Sie sich bitte an den Vermieter.
+
+## 🛠️ Schäden & Diebstahl
+
+### a) Schadensmeldung
+Alle Schäden, Defekte oder Mängel müssen **sofort** dem Vermieter gemeldet werden. Dies umfasst auch kleinere Schäden wie verstopfte Abflüsse, defekte Geräte oder beschädigte Einrichtungsgegenstände.
+
+**Kontakt für Schadensmeldungen:** ${einheitlicheRegeln.vermieeterName} - ${einheitlicheRegeln.vermieterTelefon}
+
+### b) Haftung für Schäden
+Gäste haften vollumfänglich für alle während ihres Aufenthalts verursachten Schäden. Dies umfasst Reparaturkosten, Ersatzbeschaffung und eventuell notwendige Sonderreinigungen.
+
+### c) Diebstahl und Vandalismus
+Bei Diebstahl oder mutwilliger Beschädigung werden folgende Kosten in Rechnung gestellt:
+- Wiederbeschaffungskosten oder Reparaturkosten
+- **Entgangene Mieteinnahmen** für die Zeit, in der die Wohnung aufgrund des Schadens nicht vermietet werden kann
+- Kosten für Handwerker und Ersatzbeschaffung
+- Administrative Kosten
+
+### d) Verlust von Schlüsseln
+Bei Verlust von Wohnungsschlüsseln, Hausschlüsseln oder anderen Zugangsberechtigungen werden folgende Kosten in Rechnung gestellt:
+- Kosten für Schlüsseldienst und Schlosswechsel
+- Anfertigung neuer Schlüssel für alle Einheiten
+- Arbeitszeit und Anfahrtskosten
+- Bei elektronischen Zugangssystemen: Neuprogrammierung aller Codes/Karten
+
+**Wichtiger Hinweis:** Schlüssel dürfen niemals unbeaufsichtigt gelassen oder an Dritte weitergegeben werden.
+
+### e) Sofortige Sperrung
+Bei schwerwiegenden Schäden oder Diebstahl behält sich der Vermieter das Recht vor, den Mietvertrag sofort zu kündigen und die Räumung der Wohnung zu verlangen.
 
 ## 🕐 An- und Abreise
 
@@ -908,7 +941,7 @@ Eine Verletzung dieser Hausordnung verstößt gegen die Mietbedingungen gemäß 
 
                 <div>
                   <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px' }}>
-                    Rauchen erlaubt:
+                    Rauchen in der Wohnung:
                   </label>
                   <select
                     value={einheitlicheRegeln.rauchenErlaubt}
@@ -917,12 +950,35 @@ Eine Verletzung dieser Hausordnung verstößt gegen die Mietbedingungen gemäß 
                       padding: '8px 12px', 
                       border: `1px solid ${styles.secondary}`, 
                       borderRadius: '4px',
-                      width: '100%'
+                      width: '100%',
+                      marginBottom: '8px'
                     }}
                   >
                     <option value="false">Nein, Rauchverbot</option>
                     <option value="true">Ja, Rauchen erlaubt</option>
                   </select>
+                  
+                  {!einheitlicheRegeln.rauchenErlaubt && (
+                    <div>
+                      <label style={{ display: 'block', fontWeight: '500', marginBottom: '4px', fontSize: '14px' }}>
+                        Rauchen auf Balkon/Terrasse:
+                      </label>
+                      <select
+                        value={einheitlicheRegeln.rauchenBalkonErlaubt}
+                        onChange={(e) => updateEinheitlich('rauchenBalkonErlaubt', e.target.value === 'true')}
+                        style={{ 
+                          padding: '6px 8px', 
+                          border: `1px solid ${styles.secondary}`, 
+                          borderRadius: '4px',
+                          width: '100%',
+                          fontSize: '14px'
+                        }}
+                      >
+                        <option value="false">Nein, auch auf Balkon verboten</option>
+                        <option value="true">Ja, auf Balkon/Terrasse erlaubt</option>
+                      </select>
+                    </div>
+                  )}
                 </div>
 
                 <div>
