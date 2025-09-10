@@ -431,6 +431,38 @@ ${globalSettings.hundegebuehrUnterschiedlich ?
 
 **Ausnahme Assistenzhunde:** Zertifizierte Assistenzhunde (Blindenführhunde, Servicehunde, etc.) sind von der Hundegebühr befreit. Ein entsprechender Nachweis ist bei der Buchung oder Anreise vorzulegen. Assistenzhunde müssen dennoch die allgemeinen Hunderegeln befolgen.` : ''}
 
+## 🚫 Gewerbliche Nutzung
+
+### a) Nutzungsart
+Die Ferienwohnungen sind ausschließlich für private Nutzung bestimmt. Jegliche gewerbliche Nutzung ist untersagt.
+
+**Homeoffice/Remote Work:** Die private berufliche Tätigkeit im Homeoffice ist selbstverständlich gestattet und fällt unter die erlaubte private Nutzung.
+
+### b) Foto- und Videoproduktionen
+Fotoshootings, Videodrehs oder ähnliche kommerzielle Produktionen sind nur mit ausdrücklicher vorheriger schriftlicher Genehmigung des Vermieters gestattet.
+
+### c) Verbotene Aktivitäten
+Prostitution und damit verbundene Aktivitäten sind in den Räumlichkeiten strengstens verboten.
+
+### d) Vertragsstrafe
+Bei Verstoß gegen diese Regelungen wird eine Vertragsstrafe von **250€** erhoben. Dies erfolgt zusätzlich zu eventuellen Schadensersatzforderungen.
+
+## 📶 WLAN
+
+### a) Nutzungsbedingungen
+Den Gästen wird kostenfreier WLAN-Zugang zur Verfügung gestellt. Die Nutzung unterliegt einer Fair Use Policy für angemessene private Nutzung.
+
+### b) Verbotene Aktivitäten
+- Illegale Downloads und Streaming von urheberrechtlich geschütztem Material sind strengstens untersagt
+- Filesharing, Torrents und P2P-Aktivitäten sind nicht gestattet
+- Jegliche rechtswidrige Internetnutzung ist verboten
+
+### c) Haftung
+Der Gast haftet vollumfänglich für alle Kosten, Schäden und rechtlichen Konsequenzen, die durch Rechtsverstöße bei der Internetnutzung entstehen. Dies umfasst Abmahngebühren, Anwaltskosten und Schadensersatzforderungen.
+
+### d) Sperrung
+Bei Missbrauch behält sich der Vermieter das Recht vor, den WLAN-Zugang für den Gast zu sperren.
+
 ## 🕐 An- und Abreise
 
 ### a) Check-in
