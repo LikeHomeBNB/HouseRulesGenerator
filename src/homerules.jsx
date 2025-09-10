@@ -42,6 +42,25 @@ const HausregelnGenerator = () => {
     checkoutBis: '11:00'
   });
 
+  // Globale Einstellungen für variable Regeln
+  const [globalSettings, setGlobalSettings] = useState({
+    parkplaetzeVorhanden: true,
+    parkplaetzeUnterschiedlich: true,
+    parkplaetzeGlobal: 1, // Wert wenn nicht unterschiedlich
+    parkplaetzeKostenpflichtig: false,
+    parkplatzgebuehrUnterschiedlich: false,
+    parkplatzgebuehrGlobal: 10, // Euro pro Tag
+    poolVorhanden: true,
+    poolUnterschiedlich: true,
+    poolGlobal: false, // Wert wenn nicht unterschiedlich
+    gemeinschaftsgartenVorhanden: true,
+    privatgartenVorhanden: true,
+    gartenUnterschiedlich: true,
+    gartenGlobal: 'gemeinschaft', // Wert wenn nicht unterschiedlich
+    hundegebuehrUnterschiedlich: false,
+    hundegebuehrGlobal: 25 // Euro pro Aufenthalt
+  });
+
   // Variable Regeln (pro Wohnung)
   const [variableRegeln, setVariableRegeln] = useState({
     parkplaetze: {
@@ -70,10 +89,38 @@ const HausregelnGenerator = () => {
       5: 'gemeinschaft', // 301: Gemeinschaftsgarten
       6: 'gemeinschaft', // 302: Gemeinschaftsgarten
       7: 'keiner'       // 305: Kein Garten
+    },
+    hundegebuehr: {
+      1: 25, // 101: 25€ Hundegebühr
+      2: 25, // 102: 25€ Hundegebühr
+      3: 30, // 201: 30€ Hundegebühr
+      4: 30, // 202: 30€ Hundegebühr
+      5: 35, // 301: 35€ Hundegebühr
+      6: 35, // 302: 35€ Hundegebühr
+      7: 40  // 305: 40€ Hundegebühr
+    },
+    parkplatzgebuehr: {
+      1: 10, // 101: 10€ pro Tag
+      2: 10, // 102: 10€ pro Tag
+      3: 15, // 201: 15€ pro Tag
+      4: 15, // 202: 15€ pro Tag
+      5: 8,  // 301: 8€ pro Tag
+      6: 8,  // 302: 8€ pro Tag
+      7: 20  // 305: 20€ pro Tag
     }
   });
 
   const [activeTab, setActiveTab] = useState('konfigurator');
+
+  // Helper function to sort apartments by number
+  const sortWohnungen = (wohnungsList) => {
+    return [...wohnungsList].sort((a, b) => {
+      // Extract numeric part from apartment number for proper sorting
+      const numA = parseInt(a.nummer) || 0;
+      const numB = parseInt(b.nummer) || 0;
+      return numA - numB;
+    });
+  };
 
   // Apartment Management Functions
   const addWohnung = () => {
@@ -81,13 +128,16 @@ const HausregelnGenerator = () => {
       const newId = Math.max(...wohnungen.map(w => w.id), 0) + 1;
       const newWohnung = { ...neueWohnung, id: newId };
       
-      setWohnungen([...wohnungen, newWohnung]);
+      const updatedWohnungen = sortWohnungen([...wohnungen, newWohnung]);
+      setWohnungen(updatedWohnungen);
       
       // Add default values for the new apartment in variable rules
       setVariableRegeln(prev => ({
         parkplaetze: { ...prev.parkplaetze, [newId]: 1 },
         pool: { ...prev.pool, [newId]: false },
-        garten: { ...prev.garten, [newId]: 'gemeinschaft' }
+        garten: { ...prev.garten, [newId]: 'gemeinschaft' },
+        hundegebuehr: { ...prev.hundegebuehr, [newId]: 25 },
+        parkplatzgebuehr: { ...prev.parkplatzgebuehr, [newId]: 10 }
       }));
       
       setNeueWohnung({ nummer: '', name: '' });
@@ -103,6 +153,8 @@ const HausregelnGenerator = () => {
       delete newRules.parkplaetze[id];
       delete newRules.pool[id];
       delete newRules.garten[id];
+      delete newRules.hundegebuehr[id];
+      delete newRules.parkplatzgebuehr[id];
       return newRules;
     });
   };
@@ -113,9 +165,10 @@ const HausregelnGenerator = () => {
   };
 
   const updateWohnung = (id) => {
-    setWohnungen(wohnungen.map(w => 
+    const updatedWohnungen = sortWohnungen(wohnungen.map(w => 
       w.id === id ? { ...w, ...editData } : w
     ));
+    setWohnungen(updatedWohnungen);
     setEditMode(null);
     setEditData({});
   };
@@ -182,36 +235,90 @@ Das Gebäude verfügt über unterschiedliche Parkplatzzuteilungen je Wohnung:
 
 `;
 
-    // Parkplätze gruppiert
-    const parkplatzGruppen = gruppiereNachWert('parkplaetze');
-    Object.entries(parkplatzGruppen).forEach(([anzahl, nummern]) => {
-      const anzahlInt = parseInt(anzahl);
-      if (anzahlInt === 0) {
-        output += `- **Keine Parkplätze:** Apartment ${formatWohnungsListe(nummern)} - Gäste können öffentliche Parkplätze in der Umgebung nutzen\n`;
-      } else if (anzahlInt === 1) {
-        output += `- **1 Parkplatz:** Apartment ${formatWohnungsListe(nummern)}\n`;
-      } else if (anzahlInt === 2) {
-        output += `- **2 Parkplätze:** Apartment ${formatWohnungsListe(nummern)}\n`;
+    // Parkplätze basierend auf globalen Einstellungen
+    if (globalSettings.parkplaetzeVorhanden) {
+      if (globalSettings.parkplaetzeUnterschiedlich) {
+        // Unterschiedliche Parkplätze pro Apartment
+        const parkplatzGruppen = gruppiereNachWert('parkplaetze');
+        Object.entries(parkplatzGruppen).forEach(([anzahl, nummern]) => {
+          const anzahlInt = parseInt(anzahl);
+          if (anzahlInt === 0) {
+            output += `- **Keine Parkplätze:** Apartment ${formatWohnungsListe(nummern)} - Gäste können öffentliche Parkplätze in der Umgebung nutzen\n`;
+          } else if (anzahlInt === 1) {
+            output += `- **1 Parkplatz:** Apartment ${formatWohnungsListe(nummern)}\n`;
+          } else if (anzahlInt === 2) {
+            output += `- **2 Parkplätze:** Apartment ${formatWohnungsListe(nummern)}\n`;
+          } else {
+            output += `- **3+ Parkplätze:** Apartment ${formatWohnungsListe(nummern)}\n`;
+          }
+        });
       } else {
-        output += `- **3+ Parkplätze:** Apartment ${formatWohnungsListe(nummern)}\n`;
+        // Alle Apartments haben die gleiche Anzahl Parkplätze
+        const anzahl = globalSettings.parkplaetzeGlobal;
+        const alleNummern = wohnungen.map(w => w.nummer);
+        if (anzahl === 0) {
+          output += `- **Keine Parkplätze:** Alle Apartments - Gäste können öffentliche Parkplätze in der Umgebung nutzen\n`;
+        } else if (anzahl === 1) {
+          output += `- **1 Parkplatz:** Alle Apartments (${formatWohnungsListe(alleNummern)})\n`;
+        } else if (anzahl === 2) {
+          output += `- **2 Parkplätze:** Alle Apartments (${formatWohnungsListe(alleNummern)})\n`;
+        } else {
+          output += `- **3+ Parkplätze:** Alle Apartments (${formatWohnungsListe(alleNummern)})\n`;
+        }
       }
-    });
+    } else {
+      // Keine Parkplätze verfügbar
+      output += `- **Keine Parkplätze verfügbar** - Gäste können öffentliche Parkplätze in der Umgebung nutzen\n`;
+    }
 
-    // Pool-Bereich nur wenn mindestens eine Wohnung Pool hat
-    const poolGruppen = gruppiereNachWert('pool');
-    if (poolGruppen.true && poolGruppen.true.length > 0) {
+    // Parkgebühren wenn kostenpflichtig
+    if (globalSettings.parkplaetzeVorhanden && globalSettings.parkplaetzeKostenpflichtig) {
+      output += `\n### c) Parkgebühren
+`;
+      if (globalSettings.parkplatzgebuehrUnterschiedlich) {
+        // Unterschiedliche Gebühren pro Apartment
+        const gebuehrGruppen = gruppiereNachWert('parkplatzgebuehr');
+        output += `Die Parkgebühren variieren je nach Apartment:\n\n`;
+        Object.entries(gebuehrGruppen).forEach(([gebuehr, nummern]) => {
+          output += `- **${gebuehr}€ pro Tag:** Apartment ${formatWohnungsListe(nummern)}\n`;
+        });
+      } else {
+        // Einheitliche Gebühr für alle
+        output += `Für alle Apartments gilt eine einheitliche Parkgebühr von **${globalSettings.parkplatzgebuehrGlobal}€ pro Tag**.\n`;
+      }
+      output += `\nDie Parkgebühren sind bei der Ankunft oder im Voraus zu entrichten.\n`;
+    }
+
+    // Pool-Bereich basierend auf globalen Einstellungen
+    if (globalSettings.poolVorhanden) {
       output += `\n## 🏊‍♂️ Pool
 
 ### a) Verfügbarkeit
-Nur bestimmte Wohnungen in diesem Gebäude haben Zugang zum Pool:
-
-- **Pool-Zugang:** Apartment ${formatWohnungsListe(poolGruppen.true)}`;
+`;
       
-      if (poolGruppen.false && poolGruppen.false.length > 0) {
-        output += `\n- **Kein Pool-Zugang:** Apartment ${formatWohnungsListe(poolGruppen.false)}`;
+      if (globalSettings.poolUnterschiedlich) {
+        // Unterschiedlicher Pool-Zugang pro Apartment
+        const poolGruppen = gruppiereNachWert('pool');
+        output += `Nur bestimmte Wohnungen in diesem Gebäude haben Zugang zum Pool:
+
+`;
+        if (poolGruppen.true && poolGruppen.true.length > 0) {
+          output += `- **Pool-Zugang:** Apartment ${formatWohnungsListe(poolGruppen.true)}\n`;
+        }
+        if (poolGruppen.false && poolGruppen.false.length > 0) {
+          output += `- **Kein Pool-Zugang:** Apartment ${formatWohnungsListe(poolGruppen.false)}\n`;
+        }
+      } else {
+        // Alle Apartments haben den gleichen Pool-Zugang
+        const alleNummern = wohnungen.map(w => w.nummer);
+        if (globalSettings.poolGlobal) {
+          output += `Alle Apartments haben Zugang zum Pool: ${formatWohnungsListe(alleNummern)}\n`;
+        } else {
+          output += `Keine Apartments haben Pool-Zugang: ${formatWohnungsListe(alleNummern)}\n`;
+        }
       }
 
-      output += `\n\n### b) Nutzungszeiten (für berechtigte Wohnungen)
+      output += `\n### b) Nutzungszeiten (für berechtigte Wohnungen)
 Der Pool darf nur in der Zeit von **08:00 Uhr bis 22:00 Uhr** benutzt werden.
 
 ### c) Sicherheitsregeln
@@ -223,32 +330,49 @@ Bitte duschen Sie sich, bevor Sie den Pool betreten.
 `;
     }
 
-    // Garten-Bereich
-    const gartenGruppen = gruppiereNachWert('garten');
-    const hatGarten = (gartenGruppen.privat && gartenGruppen.privat.length > 0) || 
-                     (gartenGruppen.gemeinschaft && gartenGruppen.gemeinschaft.length > 0);
-    
-    if (hatGarten) {
+    // Garten-Bereich basierend auf globalen Einstellungen
+    if (globalSettings.gemeinschaftsgartenVorhanden || globalSettings.privatgartenVorhanden) {
       output += `## 🌳 Garten & Außenbereiche
 
 ### a) Gartenverfügbarkeit
-Die Wohnungen in diesem Gebäude haben unterschiedliche Gartenzugänge:
+`;
+
+      if (globalSettings.gartenUnterschiedlich) {
+        // Unterschiedlicher Garten-Zugang pro Apartment
+        const gartenGruppen = gruppiereNachWert('garten');
+        output += `Die Wohnungen in diesem Gebäude haben unterschiedliche Gartenzugänge:
 
 `;
-      
-      if (gartenGruppen.gemeinschaft && gartenGruppen.gemeinschaft.length > 0) {
-        output += `- **Gemeinschaftsgarten:** Apartment ${formatWohnungsListe(gartenGruppen.gemeinschaft)}\n`;
-      }
-      
-      if (gartenGruppen.privat && gartenGruppen.privat.length > 0) {
-        output += `- **Privater Garten:** Apartment ${formatWohnungsListe(gartenGruppen.privat)}\n`;
-      }
-      
-      if (gartenGruppen.keiner && gartenGruppen.keiner.length > 0) {
-        output += `- **Kein Garten:** Apartment ${formatWohnungsListe(gartenGruppen.keiner)}\n`;
+        
+        if (globalSettings.gemeinschaftsgartenVorhanden && gartenGruppen.gemeinschaft && gartenGruppen.gemeinschaft.length > 0) {
+          output += `- **Gemeinschaftsgarten:** Apartment ${formatWohnungsListe(gartenGruppen.gemeinschaft)}\n`;
+        }
+        
+        if (globalSettings.privatgartenVorhanden && gartenGruppen.privat && gartenGruppen.privat.length > 0) {
+          output += `- **Privater Garten:** Apartment ${formatWohnungsListe(gartenGruppen.privat)}\n`;
+        }
+        
+        if (gartenGruppen.keiner && gartenGruppen.keiner.length > 0) {
+          output += `- **Kein Garten:** Apartment ${formatWohnungsListe(gartenGruppen.keiner)}\n`;
+        }
+      } else {
+        // Alle Apartments haben den gleichen Garten-Zugang
+        const alleNummern = wohnungen.map(w => w.nummer);
+        if (globalSettings.gartenGlobal === 'gemeinschaft') {
+          output += `Alle Apartments haben Zugang zum Gemeinschaftsgarten: ${formatWohnungsListe(alleNummern)}\n`;
+        } else if (globalSettings.gartenGlobal === 'privat') {
+          output += `Alle Apartments haben einen privaten Garten: ${formatWohnungsListe(alleNummern)}\n`;
+        } else {
+          output += `Keine Apartments haben Garten-Zugang: ${formatWohnungsListe(alleNummern)}\n`;
+        }
       }
 
-      if (gartenGruppen.gemeinschaft && gartenGruppen.gemeinschaft.length > 0) {
+      // Regeln für Gemeinschaftsgarten
+      const hasGemeinschaftsgarten = globalSettings.gemeinschaftsgartenVorhanden && 
+        ((!globalSettings.gartenUnterschiedlich && globalSettings.gartenGlobal === 'gemeinschaft') ||
+         (globalSettings.gartenUnterschiedlich && Object.values(variableRegeln.garten).includes('gemeinschaft')));
+
+      if (hasGemeinschaftsgarten) {
         output += `\n### b) Regeln für Gemeinschaftsgarten
 - Nutzungszeiten: 07:00 bis 22:00 Uhr
 - Keine Änderungen an der Bepflanzung
@@ -258,7 +382,12 @@ Die Wohnungen in diesem Gebäude haben unterschiedliche Gartenzugänge:
 `;
       }
 
-      if (gartenGruppen.privat && gartenGruppen.privat.length > 0) {
+      // Regeln für private Gärten
+      const hasPrivatgarten = globalSettings.privatgartenVorhanden && 
+        ((!globalSettings.gartenUnterschiedlich && globalSettings.gartenGlobal === 'privat') ||
+         (globalSettings.gartenUnterschiedlich && Object.values(variableRegeln.garten).includes('privat')));
+
+      if (hasPrivatgarten) {
         output += `### c) Regeln für private Gärten
 - Keine Änderungen an der Bepflanzung
 - Kinder müssen beaufsichtigt werden
@@ -285,7 +414,22 @@ Haustiere sind ${einheitlicheRegeln.haustiereErlaubt ? 'in den Ferienwohnungen e
 ${einheitlicheRegeln.haustiereErlaubt ? `### b) Regeln für Haustiere
 - Haustiere müssen jederzeit beaufsichtigt werden
 - Schäden durch Haustiere gehen zu Lasten des Gastes
-- Zusätzliche Reinigungsgebühr kann anfallen` : ''}
+- Zusätzliche Reinigungsgebühr kann anfallen
+
+### c) Besondere Hunderegeln
+- Hunde dürfen nicht im Bett oder auf der Couch aufgehalten werden
+- Bei Nichtbeachtung kann eine zusätzliche Reinigungsgebühr anfallen
+
+### d) Hundegebühren
+${globalSettings.hundegebuehrUnterschiedlich ? 
+  'Die Hundegebühren variieren je nach Apartment:\n\n' + 
+  Object.entries(gruppiereNachWert('hundegebuehr')).map(([gebuehr, nummern]) => 
+    `- **${gebuehr}€ pro Aufenthalt:** Apartment ${formatWohnungsListe(nummern)}`
+  ).join('\n') :
+  `Für alle Apartments gilt eine einheitliche Hundegebühr von **${globalSettings.hundegebuehrGlobal}€ pro Aufenthalt**.`
+}
+
+**Ausnahme Assistenzhunde:** Zertifizierte Assistenzhunde (Blindenführhunde, Servicehunde, etc.) sind von der Hundegebühr befreit. Ein entsprechender Nachweis ist bei der Buchung oder Anreise vorzulegen. Assistenzhunde müssen dennoch die allgemeinen Hunderegeln befolgen.` : ''}
 
 ## 🕐 An- und Abreise
 
@@ -321,6 +465,13 @@ Eine Verletzung dieser Hausordnung verstößt gegen die Mietbedingungen gemäß 
   // Update-Funktionen
   const updateEinheitlich = (key, value) => {
     setEinheitlicheRegeln(prev => ({
+      ...prev,
+      [key]: value
+    }));
+  };
+
+  const updateGlobalSetting = (key, value) => {
+    setGlobalSettings(prev => ({
       ...prev,
       [key]: value
     }));
@@ -524,7 +675,7 @@ Eine Verletzung dieser Hausordnung verstößt gegen die Mietbedingungen gemäß 
                 gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',
                 gap: '16px'
               }}>
-                {wohnungen.map((wohnung) => (
+                {sortWohnungen(wohnungen).map((wohnung) => (
                   <div key={wohnung.id} style={{
                     backgroundColor: styles.light,
                     padding: '16px',
@@ -728,6 +879,52 @@ Eine Verletzung dieser Hausordnung verstößt gegen die Mietbedingungen gemäß 
                     <option value="true">Ja, Haustiere erlaubt</option>
                   </select>
                 </div>
+
+                {/* Hundegebühren - nur wenn Haustiere erlaubt */}
+                {einheitlicheRegeln.haustiereErlaubt && (
+                  <div style={{
+                    backgroundColor: '#FFF8DC',
+                    padding: '16px',
+                    borderRadius: '6px',
+                    border: `1px solid ${styles.secondary}`,
+                    gridColumn: 'span 2'
+                  }}>
+                    <h4 style={{ margin: '0 0 12px 0', color: styles.dark }}>🐕 Hundegebühren</h4>
+                    
+                    <div style={{ marginBottom: '12px' }}>
+                      <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                        <input
+                          type="checkbox"
+                          checked={globalSettings.hundegebuehrUnterschiedlich}
+                          onChange={(e) => updateGlobalSetting('hundegebuehrUnterschiedlich', e.target.checked)}
+                          style={{ marginRight: '8px' }}
+                        />
+                        <span>Unterschiedliche Hundegebühren pro Apartment</span>
+                      </label>
+                    </div>
+
+                    {!globalSettings.hundegebuehrUnterschiedlich && (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <span>Hundegebühr für alle Apartments:</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <input
+                            type="number"
+                            value={globalSettings.hundegebuehrGlobal}
+                            onChange={(e) => updateGlobalSetting('hundegebuehrGlobal', parseInt(e.target.value) || 0)}
+                            style={{ 
+                              padding: '4px 8px', 
+                              border: `1px solid ${styles.secondary}`, 
+                              borderRadius: '4px',
+                              width: '80px'
+                            }}
+                            min="0"
+                          />
+                          <span>€ pro Aufenthalt</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -761,39 +958,198 @@ Eine Verletzung dieser Hausordnung verstößt gegen die Mietbedingungen gemäß 
                   <Car size={20} style={{ marginRight: '8px', color: styles.primary }} />
                   Parkplätze
                 </h3>
-                
-                <div style={{ 
-                  display: 'grid', 
-                  gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', 
-                  gap: '12px'
+
+                {/* Global Parking Settings */}
+                <div style={{
+                  backgroundColor: styles.light,
+                  padding: '16px',
+                  borderRadius: '6px',
+                  marginBottom: '16px'
                 }}>
-                  {wohnungen.map((wohnung) => (
-                    <div key={wohnung.id} style={{
-                      padding: '12px',
-                      backgroundColor: styles.light,
-                      borderRadius: '6px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between'
-                    }}>
-                      <span style={{ fontWeight: '600' }}>{wohnung.nummer}</span>
-                      <select
-                        value={variableRegeln.parkplaetze[wohnung.id]}
-                        onChange={(e) => updateVariable('parkplaetze', wohnung.id, parseInt(e.target.value))}
-                        style={{ 
-                          padding: '4px 8px', 
-                          border: `1px solid ${styles.secondary}`, 
-                          borderRadius: '4px'
-                        }}
-                      >
-                        <option value={0}>Keine</option>
-                        <option value={1}>1 Platz</option>
-                        <option value={2}>2 Plätze</option>
-                        <option value={3}>3+ Plätze</option>
-                      </select>
+                  <div style={{ marginBottom: '12px' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                      <input
+                        type="checkbox"
+                        checked={globalSettings.parkplaetzeVorhanden}
+                        onChange={(e) => updateGlobalSetting('parkplaetzeVorhanden', e.target.checked)}
+                        style={{ marginRight: '8px' }}
+                      />
+                      <span style={{ fontWeight: '600' }}>Es gibt Parkplätze</span>
+                    </label>
+                  </div>
+
+                  {globalSettings.parkplaetzeVorhanden && (
+                    <div>
+                      <div style={{ marginBottom: '12px' }}>
+                        <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                          <input
+                            type="checkbox"
+                            checked={globalSettings.parkplaetzeUnterschiedlich}
+                            onChange={(e) => updateGlobalSetting('parkplaetzeUnterschiedlich', e.target.checked)}
+                            style={{ marginRight: '8px' }}
+                          />
+                          <span>Unterschiedliche Anzahl pro Apartment</span>
+                        </label>
+                      </div>
+
+                      {!globalSettings.parkplaetzeUnterschiedlich && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                          <span>Parkplätze für alle Apartments:</span>
+                          <select
+                            value={globalSettings.parkplaetzeGlobal}
+                            onChange={(e) => updateGlobalSetting('parkplaetzeGlobal', parseInt(e.target.value))}
+                            style={{ 
+                              padding: '4px 8px', 
+                              border: `1px solid ${styles.secondary}`, 
+                              borderRadius: '4px'
+                            }}
+                          >
+                            <option value={0}>Keine</option>
+                            <option value={1}>1 Platz</option>
+                            <option value={2}>2 Plätze</option>
+                            <option value={3}>3+ Plätze</option>
+                          </select>
+                        </div>
+                      )}
+
+                      {/* Parkgebühren */}
+                      <div style={{ 
+                        backgroundColor: '#E8F5FF', 
+                        padding: '12px', 
+                        borderRadius: '4px',
+                        marginTop: '12px'
+                      }}>
+                        <div style={{ marginBottom: '12px' }}>
+                          <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                            <input
+                              type="checkbox"
+                              checked={globalSettings.parkplaetzeKostenpflichtig}
+                              onChange={(e) => updateGlobalSetting('parkplaetzeKostenpflichtig', e.target.checked)}
+                              style={{ marginRight: '8px' }}
+                            />
+                            <span style={{ fontWeight: '600' }}>Parkplätze sind kostenpflichtig</span>
+                          </label>
+                        </div>
+
+                        {globalSettings.parkplaetzeKostenpflichtig && (
+                          <div>
+                            <div style={{ marginBottom: '12px' }}>
+                              <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                                <input
+                                  type="checkbox"
+                                  checked={globalSettings.parkplatzgebuehrUnterschiedlich}
+                                  onChange={(e) => updateGlobalSetting('parkplatzgebuehrUnterschiedlich', e.target.checked)}
+                                  style={{ marginRight: '8px' }}
+                                />
+                                <span>Unterschiedliche Gebühren pro Apartment</span>
+                              </label>
+                            </div>
+
+                            {!globalSettings.parkplatzgebuehrUnterschiedlich && (
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                <span>Parkgebühr für alle Apartments:</span>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                  <input
+                                    type="number"
+                                    value={globalSettings.parkplatzgebuehrGlobal}
+                                    onChange={(e) => updateGlobalSetting('parkplatzgebuehrGlobal', parseInt(e.target.value) || 0)}
+                                    style={{ 
+                                      padding: '4px 8px', 
+                                      border: `1px solid ${styles.secondary}`, 
+                                      borderRadius: '4px',
+                                      width: '80px'
+                                    }}
+                                    min="0"
+                                  />
+                                  <span>€ pro Tag</span>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  ))}
+                  )}
                 </div>
+                
+                {globalSettings.parkplaetzeVorhanden && globalSettings.parkplaetzeUnterschiedlich && (
+                  <div>
+                    <div style={{ 
+                      display: 'grid', 
+                      gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', 
+                      gap: '12px'
+                    }}>
+                      {sortWohnungen(wohnungen).map((wohnung) => (
+                        <div key={wohnung.id} style={{
+                          padding: '12px',
+                          backgroundColor: styles.light,
+                          borderRadius: '6px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between'
+                        }}>
+                          <span style={{ fontWeight: '600' }}>{wohnung.nummer}</span>
+                          <select
+                            value={variableRegeln.parkplaetze[wohnung.id]}
+                            onChange={(e) => updateVariable('parkplaetze', wohnung.id, parseInt(e.target.value))}
+                            style={{ 
+                              padding: '4px 8px', 
+                              border: `1px solid ${styles.secondary}`, 
+                              borderRadius: '4px'
+                            }}
+                          >
+                            <option value={0}>Keine</option>
+                            <option value={1}>1 Platz</option>
+                            <option value={2}>2 Plätze</option>
+                            <option value={3}>3+ Plätze</option>
+                          </select>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Parkgebühren pro Apartment */}
+                    {globalSettings.parkplaetzeKostenpflichtig && globalSettings.parkplatzgebuehrUnterschiedlich && (
+                      <div style={{ marginTop: '16px' }}>
+                        <h4 style={{ margin: '0 0 12px 0', color: styles.dark, fontSize: '16px' }}>
+                          💰 Parkgebühren pro Apartment
+                        </h4>
+                        <div style={{ 
+                          display: 'grid', 
+                          gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', 
+                          gap: '12px'
+                        }}>
+                          {sortWohnungen(wohnungen).map((wohnung) => (
+                            <div key={wohnung.id} style={{
+                              padding: '12px',
+                              backgroundColor: '#E8F5FF',
+                              borderRadius: '6px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between'
+                            }}>
+                              <span style={{ fontWeight: '600' }}>{wohnung.nummer}</span>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <input
+                                  type="number"
+                                  value={variableRegeln.parkplatzgebuehr[wohnung.id]}
+                                  onChange={(e) => updateVariable('parkplatzgebuehr', wohnung.id, parseInt(e.target.value) || 0)}
+                                  style={{ 
+                                    padding: '4px 8px', 
+                                    border: `1px solid ${styles.secondary}`, 
+                                    borderRadius: '4px',
+                                    width: '60px'
+                                  }}
+                                  min="0"
+                                />
+                                <span style={{ fontSize: '14px' }}>€/Tag</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Pool */}
@@ -808,37 +1164,93 @@ Eine Verletzung dieser Hausordnung verstößt gegen die Mietbedingungen gemäß 
                   <Waves size={20} style={{ marginRight: '8px', color: styles.primary }} />
                   Pool-Zugang
                 </h3>
-                
-                <div style={{ 
-                  display: 'grid', 
-                  gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', 
-                  gap: '12px'
+
+                {/* Global Pool Settings */}
+                <div style={{
+                  backgroundColor: styles.light,
+                  padding: '16px',
+                  borderRadius: '6px',
+                  marginBottom: '16px'
                 }}>
-                  {wohnungen.map((wohnung) => (
-                    <div key={wohnung.id} style={{
-                      padding: '12px',
-                      backgroundColor: styles.light,
-                      borderRadius: '6px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between'
-                    }}>
-                      <span style={{ fontWeight: '600' }}>{wohnung.nummer}</span>
-                      <select
-                        value={variableRegeln.pool[wohnung.id]}
-                        onChange={(e) => updateVariable('pool', wohnung.id, e.target.value === 'true')}
-                        style={{ 
-                          padding: '4px 8px', 
-                          border: `1px solid ${styles.secondary}`, 
-                          borderRadius: '4px'
-                        }}
-                      >
-                        <option value={false}>Kein Pool</option>
-                        <option value={true}>Pool-Zugang</option>
-                      </select>
+                  <div style={{ marginBottom: '12px' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                      <input
+                        type="checkbox"
+                        checked={globalSettings.poolVorhanden}
+                        onChange={(e) => updateGlobalSetting('poolVorhanden', e.target.checked)}
+                        style={{ marginRight: '8px' }}
+                      />
+                      <span style={{ fontWeight: '600' }}>Es gibt einen Pool</span>
+                    </label>
+                  </div>
+
+                  {globalSettings.poolVorhanden && (
+                    <div>
+                      <div style={{ marginBottom: '12px' }}>
+                        <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                          <input
+                            type="checkbox"
+                            checked={globalSettings.poolUnterschiedlich}
+                            onChange={(e) => updateGlobalSetting('poolUnterschiedlich', e.target.checked)}
+                            style={{ marginRight: '8px' }}
+                          />
+                          <span>Unterschiedlicher Pool-Zugang pro Apartment</span>
+                        </label>
+                      </div>
+
+                      {!globalSettings.poolUnterschiedlich && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                          <span>Pool-Zugang für alle Apartments:</span>
+                          <select
+                            value={globalSettings.poolGlobal}
+                            onChange={(e) => updateGlobalSetting('poolGlobal', e.target.value === 'true')}
+                            style={{ 
+                              padding: '4px 8px', 
+                              border: `1px solid ${styles.secondary}`, 
+                              borderRadius: '4px'
+                            }}
+                          >
+                            <option value={false}>Kein Pool-Zugang</option>
+                            <option value={true}>Pool-Zugang</option>
+                          </select>
+                        </div>
+                      )}
                     </div>
-                  ))}
+                  )}
                 </div>
+                
+                {globalSettings.poolVorhanden && globalSettings.poolUnterschiedlich && (
+                  <div style={{ 
+                    display: 'grid', 
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', 
+                    gap: '12px'
+                  }}>
+                    {sortWohnungen(wohnungen).map((wohnung) => (
+                      <div key={wohnung.id} style={{
+                        padding: '12px',
+                        backgroundColor: styles.light,
+                        borderRadius: '6px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between'
+                      }}>
+                        <span style={{ fontWeight: '600' }}>{wohnung.nummer}</span>
+                        <select
+                          value={variableRegeln.pool[wohnung.id]}
+                          onChange={(e) => updateVariable('pool', wohnung.id, e.target.value === 'true')}
+                          style={{ 
+                            padding: '4px 8px', 
+                            border: `1px solid ${styles.secondary}`, 
+                            borderRadius: '4px'
+                          }}
+                        >
+                          <option value={false}>Kein Pool-Zugang</option>
+                          <option value={true}>Pool-Zugang</option>
+                        </select>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Garten */}
@@ -853,39 +1265,162 @@ Eine Verletzung dieser Hausordnung verstößt gegen die Mietbedingungen gemäß 
                   <TreePine size={20} style={{ marginRight: '8px', color: styles.primary }} />
                   Garten-Zugang
                 </h3>
-                
-                <div style={{ 
-                  display: 'grid', 
-                  gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', 
-                  gap: '12px'
+
+                {/* Global Garden Settings */}
+                <div style={{
+                  backgroundColor: styles.light,
+                  padding: '16px',
+                  borderRadius: '6px',
+                  marginBottom: '16px'
                 }}>
-                  {wohnungen.map((wohnung) => (
-                    <div key={wohnung.id} style={{
-                      padding: '12px',
-                      backgroundColor: styles.light,
-                      borderRadius: '6px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between'
-                    }}>
-                      <span style={{ fontWeight: '600' }}>{wohnung.nummer}</span>
-                      <select
-                        value={variableRegeln.garten[wohnung.id]}
-                        onChange={(e) => updateVariable('garten', wohnung.id, e.target.value)}
-                        style={{ 
-                          padding: '4px 8px', 
-                          border: `1px solid ${styles.secondary}`, 
-                          borderRadius: '4px'
-                        }}
-                      >
-                        <option value="keiner">Kein Garten</option>
-                        <option value="gemeinschaft">Gemeinschaft</option>
-                        <option value="privat">Privat</option>
-                      </select>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                      <input
+                        type="checkbox"
+                        checked={globalSettings.gemeinschaftsgartenVorhanden}
+                        onChange={(e) => updateGlobalSetting('gemeinschaftsgartenVorhanden', e.target.checked)}
+                        style={{ marginRight: '8px' }}
+                      />
+                      <span style={{ fontWeight: '600' }}>Es gibt einen Gemeinschaftsgarten</span>
+                    </label>
+                    <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                      <input
+                        type="checkbox"
+                        checked={globalSettings.privatgartenVorhanden}
+                        onChange={(e) => updateGlobalSetting('privatgartenVorhanden', e.target.checked)}
+                        style={{ marginRight: '8px' }}
+                      />
+                      <span style={{ fontWeight: '600' }}>Es gibt private Gärten</span>
+                    </label>
+                  </div>
+
+                  {(globalSettings.gemeinschaftsgartenVorhanden || globalSettings.privatgartenVorhanden) && (
+                    <div>
+                      <div style={{ marginBottom: '12px' }}>
+                        <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                          <input
+                            type="checkbox"
+                            checked={globalSettings.gartenUnterschiedlich}
+                            onChange={(e) => updateGlobalSetting('gartenUnterschiedlich', e.target.checked)}
+                            style={{ marginRight: '8px' }}
+                          />
+                          <span>Unterschiedlicher Garten-Zugang pro Apartment</span>
+                        </label>
+                      </div>
+
+                      {!globalSettings.gartenUnterschiedlich && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                          <span>Garten-Zugang für alle Apartments:</span>
+                          <select
+                            value={globalSettings.gartenGlobal}
+                            onChange={(e) => updateGlobalSetting('gartenGlobal', e.target.value)}
+                            style={{ 
+                              padding: '4px 8px', 
+                              border: `1px solid ${styles.secondary}`, 
+                              borderRadius: '4px'
+                            }}
+                          >
+                            <option value="keiner">Kein Garten</option>
+                            {globalSettings.gemeinschaftsgartenVorhanden && (
+                              <option value="gemeinschaft">Gemeinschaftsgarten</option>
+                            )}
+                            {globalSettings.privatgartenVorhanden && (
+                              <option value="privat">Privater Garten</option>
+                            )}
+                          </select>
+                        </div>
+                      )}
                     </div>
-                  ))}
+                  )}
                 </div>
+                
+                {(globalSettings.gemeinschaftsgartenVorhanden || globalSettings.privatgartenVorhanden) && globalSettings.gartenUnterschiedlich && (
+                  <div style={{ 
+                    display: 'grid', 
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', 
+                    gap: '12px'
+                  }}>
+                    {sortWohnungen(wohnungen).map((wohnung) => (
+                      <div key={wohnung.id} style={{
+                        padding: '12px',
+                        backgroundColor: styles.light,
+                        borderRadius: '6px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between'
+                      }}>
+                        <span style={{ fontWeight: '600' }}>{wohnung.nummer}</span>
+                        <select
+                          value={variableRegeln.garten[wohnung.id]}
+                          onChange={(e) => updateVariable('garten', wohnung.id, e.target.value)}
+                          style={{ 
+                            padding: '4px 8px', 
+                            border: `1px solid ${styles.secondary}`, 
+                            borderRadius: '4px'
+                          }}
+                        >
+                          <option value="keiner">Kein Garten</option>
+                          {globalSettings.gemeinschaftsgartenVorhanden && (
+                            <option value="gemeinschaft">Gemeinschaftsgarten</option>
+                          )}
+                          {globalSettings.privatgartenVorhanden && (
+                            <option value="privat">Privater Garten</option>
+                          )}
+                        </select>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
+
+              {/* Hundegebühren pro Apartment - nur wenn Haustiere erlaubt und unterschiedlich */}
+              {einheitlicheRegeln.haustiereErlaubt && globalSettings.hundegebuehrUnterschiedlich && (
+                <div style={{ marginTop: '32px' }}>
+                  <h3 style={{ 
+                    margin: '0 0 16px 0',
+                    color: styles.dark,
+                    fontSize: '18px',
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}>
+                    🐕 Hundegebühren pro Apartment
+                  </h3>
+                  
+                  <div style={{ 
+                    display: 'grid', 
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', 
+                    gap: '12px'
+                  }}>
+                    {sortWohnungen(wohnungen).map((wohnung) => (
+                      <div key={wohnung.id} style={{
+                        padding: '12px',
+                        backgroundColor: styles.light,
+                        borderRadius: '6px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between'
+                      }}>
+                        <span style={{ fontWeight: '600' }}>{wohnung.nummer}</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <input
+                            type="number"
+                            value={variableRegeln.hundegebuehr[wohnung.id]}
+                            onChange={(e) => updateVariable('hundegebuehr', wohnung.id, parseInt(e.target.value) || 0)}
+                            style={{ 
+                              padding: '4px 8px', 
+                              border: `1px solid ${styles.secondary}`, 
+                              borderRadius: '4px',
+                              width: '80px'
+                            }}
+                            min="0"
+                          />
+                          <span style={{ fontSize: '14px' }}>€</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Gruppierungs-Vorschau */}
@@ -907,39 +1442,119 @@ Eine Verletzung dieser Hausordnung verstößt gegen die Mietbedingungen gemäß 
                 {/* Parkplätze Gruppierung */}
                 <div>
                   <h4 style={{ margin: '0 0 12px 0', color: styles.dark }}>🚗 Parkplätze:</h4>
-                  {Object.entries(gruppiereNachWert('parkplaetze')).map(([anzahl, nummern]) => (
-                    <div key={anzahl} style={{ marginBottom: '4px', fontSize: '14px' }}>
-                      <strong>
-                        {anzahl === '0' ? 'Keine' : 
-                         anzahl === '1' ? '1 Parkplatz' : 
-                         anzahl === '2' ? '2 Parkplätze' : '3+ Parkplätze'}:
-                      </strong> {formatWohnungsListe(nummern)}
+                  {!globalSettings.parkplaetzeVorhanden ? (
+                    <div style={{ fontSize: '14px' }}>
+                      <strong>Keine Parkplätze verfügbar</strong>
                     </div>
-                  ))}
+                  ) : !globalSettings.parkplaetzeUnterschiedlich ? (
+                    <div style={{ fontSize: '14px' }}>
+                      <strong>
+                        {globalSettings.parkplaetzeGlobal === 0 ? 'Keine' : 
+                         globalSettings.parkplaetzeGlobal === 1 ? '1 Parkplatz' : 
+                         globalSettings.parkplaetzeGlobal === 2 ? '2 Parkplätze' : '3+ Parkplätze'}:
+                      </strong> Alle Apartments
+                      {globalSettings.parkplaetzeKostenpflichtig && (
+                        <div style={{ fontSize: '13px', marginTop: '4px', color: styles.secondary }}>
+                          💰 {globalSettings.parkplatzgebuehrUnterschiedlich ? 'Unterschiedliche Gebühren' : `${globalSettings.parkplatzgebuehrGlobal}€/Tag`}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <>
+                      {Object.entries(gruppiereNachWert('parkplaetze')).map(([anzahl, nummern]) => (
+                        <div key={anzahl} style={{ marginBottom: '4px', fontSize: '14px' }}>
+                          <strong>
+                            {anzahl === '0' ? 'Keine' : 
+                             anzahl === '1' ? '1 Parkplatz' : 
+                             anzahl === '2' ? '2 Parkplätze' : '3+ Parkplätze'}:
+                          </strong> {formatWohnungsListe(nummern)}
+                        </div>
+                      ))}
+                      {globalSettings.parkplaetzeKostenpflichtig && (
+                        <div style={{ marginTop: '8px', paddingTop: '8px', borderTop: `1px solid ${styles.light}` }}>
+                          <strong style={{ fontSize: '13px' }}>💰 Parkgebühren:</strong>
+                          {!globalSettings.parkplatzgebuehrUnterschiedlich ? (
+                            <div style={{ fontSize: '13px', marginTop: '4px' }}>
+                              {globalSettings.parkplatzgebuehrGlobal}€/Tag für alle
+                            </div>
+                          ) : (
+                            Object.entries(gruppiereNachWert('parkplatzgebuehr')).map(([gebuehr, nummern]) => (
+                              <div key={gebuehr} style={{ fontSize: '13px', marginTop: '2px' }}>
+                                {gebuehr}€/Tag: {formatWohnungsListe(nummern)}
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      )}
+                    </>
+                  )}
                 </div>
 
                 {/* Pool Gruppierung */}
                 <div>
                   <h4 style={{ margin: '0 0 12px 0', color: styles.dark }}>🏊‍♂️ Pool:</h4>
-                  {Object.entries(gruppiereNachWert('pool')).map(([zugang, nummern]) => (
-                    <div key={zugang} style={{ marginBottom: '4px', fontSize: '14px' }}>
-                      <strong>{zugang === 'true' ? 'Pool-Zugang' : 'Kein Pool'}:</strong> {formatWohnungsListe(nummern)}
+                  {!globalSettings.poolVorhanden ? (
+                    <div style={{ fontSize: '14px' }}>
+                      <strong>Kein Pool verfügbar</strong>
                     </div>
-                  ))}
+                  ) : !globalSettings.poolUnterschiedlich ? (
+                    <div style={{ fontSize: '14px' }}>
+                      <strong>
+                        {globalSettings.poolGlobal ? 'Pool-Zugang' : 'Kein Pool-Zugang'}:
+                      </strong> Alle Apartments
+                    </div>
+                  ) : (
+                    Object.entries(gruppiereNachWert('pool')).map(([zugang, nummern]) => (
+                      <div key={zugang} style={{ marginBottom: '4px', fontSize: '14px' }}>
+                        <strong>{zugang === 'true' ? 'Pool-Zugang' : 'Kein Pool'}:</strong> {formatWohnungsListe(nummern)}
+                      </div>
+                    ))
+                  )}
                 </div>
 
                 {/* Garten Gruppierung */}
                 <div>
                   <h4 style={{ margin: '0 0 12px 0', color: styles.dark }}>🌳 Garten:</h4>
-                  {Object.entries(gruppiereNachWert('garten')).map(([typ, nummern]) => (
-                    <div key={typ} style={{ marginBottom: '4px', fontSize: '14px' }}>
-                      <strong>
-                        {typ === 'keiner' ? 'Kein Garten' : 
-                         typ === 'gemeinschaft' ? 'Gemeinschaftsgarten' : 'Privater Garten'}:
-                      </strong> {formatWohnungsListe(nummern)}
+                  {!globalSettings.gemeinschaftsgartenVorhanden && !globalSettings.privatgartenVorhanden ? (
+                    <div style={{ fontSize: '14px' }}>
+                      <strong>Kein Garten verfügbar</strong>
                     </div>
-                  ))}
+                  ) : !globalSettings.gartenUnterschiedlich ? (
+                    <div style={{ fontSize: '14px' }}>
+                      <strong>
+                        {globalSettings.gartenGlobal === 'keiner' ? 'Kein Garten' : 
+                         globalSettings.gartenGlobal === 'gemeinschaft' ? 'Gemeinschaftsgarten' : 'Privater Garten'}:
+                      </strong> Alle Apartments
+                    </div>
+                  ) : (
+                    Object.entries(gruppiereNachWert('garten')).map(([typ, nummern]) => (
+                      <div key={typ} style={{ marginBottom: '4px', fontSize: '14px' }}>
+                        <strong>
+                          {typ === 'keiner' ? 'Kein Garten' : 
+                           typ === 'gemeinschaft' ? 'Gemeinschaftsgarten' : 'Privater Garten'}:
+                        </strong> {formatWohnungsListe(nummern)}
+                      </div>
+                    ))
+                  )}
                 </div>
+
+                {/* Hundegebühren Gruppierung - nur wenn Haustiere erlaubt */}
+                {einheitlicheRegeln.haustiereErlaubt && (
+                  <div>
+                    <h4 style={{ margin: '0 0 12px 0', color: styles.dark }}>🐕 Hundegebühren:</h4>
+                    {!globalSettings.hundegebuehrUnterschiedlich ? (
+                      <div style={{ fontSize: '14px' }}>
+                        <strong>{globalSettings.hundegebuehrGlobal}€:</strong> Alle Apartments
+                      </div>
+                    ) : (
+                      Object.entries(gruppiereNachWert('hundegebuehr')).map(([gebuehr, nummern]) => (
+                        <div key={gebuehr} style={{ marginBottom: '4px', fontSize: '14px' }}>
+                          <strong>{gebuehr}€:</strong> {formatWohnungsListe(nummern)}
+                        </div>
+                      ))
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           </div>
