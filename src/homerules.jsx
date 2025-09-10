@@ -40,7 +40,8 @@ const HausregelnGenerator = () => {
     vermieterTelefon: '+49 123 456789',
     checkinVon: '15:00',
     checkinBis: '20:00',
-    checkoutBis: '11:00'
+    checkoutBis: '11:00',
+    checkoutPflichten: 'Bei der Abreise sind folgende Punkte zwingend zu beachten: Alle elektronischen Geräte (Licht, TV, Küchengeräte) ausschalten, Heizung auf Mindesttemperatur (16-18°C) herunterregeln, Klimaanlage ausschalten, alle Fenster und Türen schließen und verriegeln, Wasserhähne fest zudrehen, Geschirr gespült einräumen, Müll ordnungsgemäß entsorgen, persönliche Gegenstände mitnehmen und die Wohnung rechtzeitig verlassen. Bei Nichteinhaltung oder verspäteter Abreise können zusätzliche Gebühren anfallen.'
   });
 
   // Globale Einstellungen für variable Regeln
@@ -538,6 +539,9 @@ Bei der Abreise bitten wir unsere Gäste, die Unterkunft bis spätestens **${ein
 
 ### c) Verspätungen
 Für Aufenthalte, die unvereinbart diesen Zeitraum überschreiten, nimmt sich der Vermieter das Recht heraus, einen Aufpreis zu verlangen.
+
+### d) Check-out Pflichten
+${einheitlicheRegeln.checkoutPflichten}
 
 ## 🆘 Notfallinformationen
 
@@ -1146,6 +1150,46 @@ Eine Verletzung dieser Hausordnung verstößt gegen die Mietbedingungen gemäß 
                         />
                       </div>
                     )}
+                  </div>
+                </div>
+
+                {/* Check-out Pflichten */}
+                <div style={{
+                  backgroundColor: '#F0F8FF',
+                  padding: '16px',
+                  borderRadius: '6px',
+                  border: `1px solid ${styles.secondary}`,
+                  gridColumn: 'span 2',
+                  marginTop: '16px'
+                }}>
+                  <h4 style={{ margin: '0 0 12px 0', color: styles.dark }}>🕐 Check-out Pflichten</h4>
+                  
+                  <label style={{ display: 'block', fontWeight: '500', marginBottom: '8px' }}>
+                    Pflichten bei der Abreise (dieser Text erscheint in den Hausregeln):
+                  </label>
+                  <textarea
+                    value={einheitlicheRegeln.checkoutPflichten}
+                    onChange={(e) => updateEinheitlich('checkoutPflichten', e.target.value)}
+                    placeholder="Beschreiben Sie hier die Pflichten der Gäste bei der Abreise..."
+                    style={{ 
+                      padding: '12px', 
+                      border: `1px solid ${styles.secondary}`, 
+                      borderRadius: '4px',
+                      width: '100%',
+                      minHeight: '120px',
+                      resize: 'vertical',
+                      fontFamily: 'inherit',
+                      fontSize: '14px',
+                      lineHeight: '1.4'
+                    }}
+                  />
+                  <div style={{ 
+                    marginTop: '8px', 
+                    fontSize: '12px', 
+                    color: styles.secondary,
+                    fontStyle: 'italic'
+                  }}>
+                    💡 Tipp: Der Text wird automatisch mit der Check-out Zeit ({einheitlicheRegeln.checkoutBis} Uhr) verknüpft
                   </div>
                 </div>
               </div>
