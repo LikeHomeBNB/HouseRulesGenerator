@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Home, Settings, FileText, Download, Car, Waves, TreePine, Users, Clock, Plus, Trash2, Edit2 } from 'lucide-react';
+import jsPDF from 'jspdf';
 
 const HausregelnGenerator = () => {
   // CSS Custom Properties für LikeHome-Farben
@@ -204,11 +205,25 @@ const HausregelnGenerator = () => {
 
   // Hausregeln-Generator
   const generiereHausregeln = () => {
-    let output = `# FERIENWOHNUNG HAUSORDNUNG
+    let output = `# HAUSORDNUNG
 
 **Liebe Gäste,**
 
 wir heißen Sie herzlich willkommen in unserer Ferienwohnung und freuen uns über Ihren Aufenthalt! Damit Sie und zukünftige Gäste sich bei uns wohlfühlen können, verpflichten Sie sich mit Ihrem Aufenthalt, diesen Regeln Folge zu leisten. Danke für Ihr Verständnis.
+
+## 🕐 An- und Abreise
+
+### a) Check-in
+Die Anreise erfolgt zwischen **${einheitlicheRegeln.checkinVon} Uhr und ${einheitlicheRegeln.checkinBis} Uhr**.
+
+### b) Check-out
+Bei der Abreise bitten wir unsere Gäste, die Unterkunft bis spätestens **${einheitlicheRegeln.checkoutBis} Uhr** freizugeben.
+
+### c) Verspätungen
+Für Aufenthalte, die unvereinbart diesen Zeitraum überschreiten, nimmt sich der Vermieter das Recht heraus, einen Aufpreis zu verlangen.
+
+### d) Check-out Pflichten
+${einheitlicheRegeln.checkoutPflichten}
 
 ## 📋 Allgemeine Richtlinien
 
@@ -511,37 +526,13 @@ Alle Schäden, Defekte oder Mängel müssen **sofort** dem Vermieter gemeldet we
 Gäste haften vollumfänglich für alle während ihres Aufenthalts verursachten Schäden. Dies umfasst Reparaturkosten, Ersatzbeschaffung und eventuell notwendige Sonderreinigungen.
 
 ### c) Diebstahl und Vandalismus
-Bei Diebstahl oder mutwilliger Beschädigung werden folgende Kosten in Rechnung gestellt:
-- Wiederbeschaffungskosten oder Reparaturkosten
-- **Entgangene Mieteinnahmen** für die Zeit, in der die Wohnung aufgrund des Schadens nicht vermietet werden kann
-- Kosten für Handwerker und Ersatzbeschaffung
-- Administrative Kosten
+Bei Diebstahl oder mutwilliger Beschädigung werden Wiederbeschaffungskosten, Reparaturkosten und entgangene Mieteinnahmen in Rechnung gestellt.
 
 ### d) Verlust von Schlüsseln
-Bei Verlust von Wohnungsschlüsseln, Hausschlüsseln oder anderen Zugangsberechtigungen werden folgende Kosten in Rechnung gestellt:
-- Kosten für Schlüsseldienst und Schlosswechsel
-- Anfertigung neuer Schlüssel für alle Einheiten
-- Arbeitszeit und Anfahrtskosten
-- Bei elektronischen Zugangssystemen: Neuprogrammierung aller Codes/Karten
-
-**Wichtiger Hinweis:** Schlüssel dürfen niemals unbeaufsichtigt gelassen oder an Dritte weitergegeben werden.
+Bei Schlüsselverlust werden Kosten für Schlüsseldienst, Schlosswechsel und neue Schlüssel berechnet. Schlüssel dürfen nicht unbeaufsichtigt gelassen werden.
 
 ### e) Sofortige Sperrung
 Bei schwerwiegenden Schäden oder Diebstahl behält sich der Vermieter das Recht vor, den Mietvertrag sofort zu kündigen und die Räumung der Wohnung zu verlangen.
-
-## 🕐 An- und Abreise
-
-### a) Check-in
-Die Anreise erfolgt zwischen **${einheitlicheRegeln.checkinVon} Uhr und ${einheitlicheRegeln.checkinBis} Uhr**.
-
-### b) Check-out
-Bei der Abreise bitten wir unsere Gäste, die Unterkunft bis spätestens **${einheitlicheRegeln.checkoutBis} Uhr** freizugeben.
-
-### c) Verspätungen
-Für Aufenthalte, die unvereinbart diesen Zeitraum überschreiten, nimmt sich der Vermieter das Recht heraus, einen Aufpreis zu verlangen.
-
-### d) Check-out Pflichten
-${einheitlicheRegeln.checkoutPflichten}
 
 ## 🆘 Notfallinformationen
 
@@ -554,13 +545,111 @@ Im Falle eines Notfalls können Sie den Vermieter wie folgt erreichen:
 ## ✅ Einverständnis
 
 Eine Verletzung dieser Hausordnung verstößt gegen die Mietbedingungen gemäß Mietvertrag. Der Vermieter behält sich das Recht vor, den Mietvertrag zu beenden und Gäste, die sich weigern, die Hausordnung zu befolgen, aus der Wohnung zu verweisen.
-
----
-
-**Ort, Datum:** _________________ **Unterschrift:** _________________
 `;
 
     return output;
+  };
+
+  // PDF-Export-Funktion
+  const exportPDF = () => {
+    const doc = new jsPDF();
+    
+    // PDF-Konfiguration
+    const margin = 20;
+    const pageWidth = doc.internal.pageSize.width;
+    const pageHeight = doc.internal.pageSize.height;
+    const maxLineWidth = pageWidth - (margin * 2);
+    let currentY = margin;
+    
+    // Hausregeln-Text generieren
+    const hausregelnText = generiereHausregeln();
+    
+    // Emojis komplett entfernen
+    const emojisToRemove = ['📋', '🔇', '🚗', '🌊', '🌳', '🚭', '🐕', '🚫', '📶', '🔍', '💥', '🕐', '🆘', '✅', '🛠️'];
+    
+    // Text bereinigen und Emojis entfernen
+    let cleanText = hausregelnText;
+    emojisToRemove.forEach(emoji => {
+      cleanText = cleanText.replaceAll(emoji, '');
+    });
+    
+    // Markdown-ähnliche Formatierung entfernen und in PDF umwandeln
+    const lines = cleanText.split('\n');
+    let skipFirstTitle = true; // Ersten Titel überspringen da wir ihn manuell setzen
+    
+    for (let i = 0; i < lines.length; i++) {
+      let line = lines[i].trim();
+      
+      // Ersten Titel überspringen
+      if (skipFirstTitle && line.startsWith('# HAUSORDNUNG')) {
+        skipFirstTitle = false;
+        
+        // Titel manuell setzen (mittig)
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(18);
+        const titleWidth = doc.getTextWidth("HAUSORDNUNG");
+        const titleX = (pageWidth - titleWidth) / 2;
+        doc.text("HAUSORDNUNG", titleX, currentY);
+        currentY += 15;
+        continue;
+      }
+      
+      // Neue Seite beginnen wenn nötig
+      if (currentY > pageHeight - 40) {
+        doc.addPage();
+        currentY = margin;
+      }
+      
+      // Überschriften formatieren
+      if (line.startsWith('# ')) {
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(16);
+        line = line.replace('# ', '');
+        currentY += 3;
+      } else if (line.startsWith('## ')) {
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(14);
+        line = line.replace('## ', '');
+        currentY += 2;
+      } else if (line.startsWith('### ')) {
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(10);
+        line = line.replace('### ', '');
+        currentY += 1;
+      } else {
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(10);
+      }
+      
+      // Fettschrift für **text** entfernen
+      line = line.replace(/\*\*(.*?)\*\*/g, '$1');
+      
+      // Leere Zeilen
+      if (line.trim() === '') {
+        currentY += 2;
+        continue;
+      }
+      
+      // Text umbrechen wenn zu lang
+      const splitText = doc.splitTextToSize(line, maxLineWidth);
+      
+      for (let j = 0; j < splitText.length; j++) {
+        if (currentY > pageHeight - 20) {
+          doc.addPage();
+          currentY = margin;
+        }
+        
+        doc.text(splitText[j], margin, currentY);
+        currentY += 4;
+      }
+      
+      // Minimaler Abstand zwischen Zeilen
+      currentY += 1;
+    }
+    
+    // PDF speichern
+    const fileName = `Hausregeln_${wohnungen.length}_Wohnungen_${new Date().toLocaleDateString('de-DE').replace(/\./g, '-')}.pdf`;
+    doc.save(fileName);
   };
 
   // Update-Funktionen
@@ -1846,19 +1935,22 @@ Eine Verletzung dieser Hausordnung verstößt gegen die Mietbedingungen gemäß 
               }}>
                 📄 Finale Hausregeln (Gruppiert)
               </h2>
-              <button style={{
-                padding: '12px 24px',
-                backgroundColor: styles.primary,
-                color: styles.white,
-                border: 'none',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                fontSize: '16px',
-                fontWeight: '600'
-              }}>
+              <button 
+                onClick={exportPDF}
+                style={{
+                  padding: '12px 24px',
+                  backgroundColor: styles.primary,
+                  color: styles.white,
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  fontSize: '16px',
+                  fontWeight: '600'
+                }}
+              >
                 <Download size={20} />
                 PDF Export
               </button>
