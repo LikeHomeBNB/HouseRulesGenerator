@@ -39,6 +39,7 @@ const HausregelnGenerator = () => {
     haustiereErlaubt: false,
     vermieeterName: 'LikeHome Service',
     vermieterTelefon: '+49 123 456789',
+    whatsappNummer: '+49 123 456789',
     checkinVon: '15:00',
     checkinBis: '20:00',
     checkoutBis: '11:00',
@@ -520,7 +521,7 @@ Gäste haben das Recht auf Auskunft, Berichtigung und Löschung ihrer personenbe
 ### a) Schadensmeldung
 Alle Schäden, Defekte oder Mängel müssen **sofort** dem Vermieter gemeldet werden. Dies umfasst auch kleinere Schäden wie verstopfte Abflüsse, defekte Geräte oder beschädigte Einrichtungsgegenstände.
 
-**Kontakt für Schadensmeldungen:** ${einheitlicheRegeln.vermieeterName} - ${einheitlicheRegeln.vermieterTelefon}
+**Schadensmeldungen per WhatsApp:** ${einheitlicheRegeln.whatsappNummer}
 
 ### b) Haftung für Schäden
 Gäste haften vollumfänglich für alle während ihres Aufenthalts verursachten Schäden. Dies umfasst Reparaturkosten, Ersatzbeschaffung und eventuell notwendige Sonderreinigungen.
@@ -1279,6 +1280,86 @@ Eine Verletzung dieser Hausordnung verstößt gegen die Mietbedingungen gemäß 
                     fontStyle: 'italic'
                   }}>
                     💡 Tipp: Der Text wird automatisch mit der Check-out Zeit ({einheitlicheRegeln.checkoutBis} Uhr) verknüpft
+                  </div>
+                </div>
+
+                {/* Kontaktdaten */}
+                <div style={{
+                  backgroundColor: '#F0F8FF',
+                  padding: '16px',
+                  borderRadius: '6px',
+                  border: `1px solid ${styles.secondary}`,
+                  gridColumn: 'span 2',
+                  marginTop: '16px'
+                }}>
+                  <h4 style={{ margin: '0 0 12px 0', color: styles.dark }}>📞 Kontaktdaten</h4>
+                  
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
+                    <div>
+                      <label style={{ display: 'block', fontWeight: '500', marginBottom: '8px' }}>
+                        Vermieter Name:
+                      </label>
+                      <input
+                        type="text"
+                        value={einheitlicheRegeln.vermieeterName}
+                        onChange={(e) => updateEinheitlich('vermieeterName', e.target.value)}
+                        placeholder="z.B. LikeHome Service"
+                        style={{ 
+                          padding: '12px', 
+                          border: `1px solid ${styles.secondary}`, 
+                          borderRadius: '4px',
+                          width: '100%',
+                          fontSize: '14px'
+                        }}
+                      />
+                    </div>
+                    
+                    <div>
+                      <label style={{ display: 'block', fontWeight: '500', marginBottom: '8px' }}>
+                        📱 WhatsApp (Schäden):
+                      </label>
+                      <input
+                        type="text"
+                        value={einheitlicheRegeln.whatsappNummer}
+                        onChange={(e) => updateEinheitlich('whatsappNummer', e.target.value)}
+                        placeholder="z.B. +49 123 456789"
+                        style={{ 
+                          padding: '12px', 
+                          border: `1px solid ${styles.secondary}`, 
+                          borderRadius: '4px',
+                          width: '100%',
+                          fontSize: '14px'
+                        }}
+                      />
+                    </div>
+                    
+                    <div>
+                      <label style={{ display: 'block', fontWeight: '500', marginBottom: '8px' }}>
+                        🚨 Notfall-Telefon:
+                      </label>
+                      <input
+                        type="text"
+                        value={einheitlicheRegeln.vermieterTelefon}
+                        onChange={(e) => updateEinheitlich('vermieterTelefon', e.target.value)}
+                        placeholder="z.B. +49 123 456789"
+                        style={{ 
+                          padding: '12px', 
+                          border: `1px solid ${styles.secondary}`, 
+                          borderRadius: '4px',
+                          width: '100%',
+                          fontSize: '14px'
+                        }}
+                      />
+                    </div>
+                  </div>
+                  
+                  <div style={{ 
+                    marginTop: '8px', 
+                    fontSize: '12px', 
+                    color: styles.secondary,
+                    fontStyle: 'italic'
+                  }}>
+                    💡 WhatsApp für Schadensmeldungen, Telefon nur für echte Notfälle
                   </div>
                 </div>
               </div>
