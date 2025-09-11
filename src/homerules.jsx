@@ -46,7 +46,8 @@ const HausregelnGenerator = () => {
     checkinFlexibel: false, // Wenn true: nach Check-in-Zeit 24/7 möglich
     checkoutBis: '11:00',
     meldebescheinigungErforderlich: true, // Check-in nur nach ausgefüllter Meldebescheinigung
-    checkoutPflichten: 'Bei der Abreise sind folgende Punkte zwingend zu beachten: Alle elektronischen Geräte (Licht, TV, Küchengeräte) ausschalten, Heizung auf Mindesttemperatur (16-18°C) herunterregeln, Klimaanlage ausschalten, alle Fenster und Türen schließen und verriegeln, Wasserhähne fest zudrehen, Geschirr gespült einräumen, Müll ordnungsgemäß entsorgen, persönliche Gegenstände mitnehmen und die Wohnung rechtzeitig verlassen. Bei Nichteinhaltung oder verspäteter Abreise können zusätzliche Gebühren anfallen.'
+    checkoutPflichten: 'Bei der Abreise sind folgende Punkte zwingend zu beachten: Alle elektronischen Geräte (Licht, TV, Küchengeräte) ausschalten, Heizung auf Mindesttemperatur (16-18°C) herunterregeln, Klimaanlage ausschalten, alle Fenster und Türen schließen und verriegeln, Wasserhähne fest zudrehen, Geschirr gespült einräumen, Müll ordnungsgemäß entsorgen, persönliche Gegenstände mitnehmen und die Wohnung rechtzeitig verlassen. Bei Nichteinhaltung oder verspäteter Abreise können zusätzliche Gebühren anfallen.',
+    checkoutPflichten_en: 'Upon departure, the following points must be observed: Turn off all electronic devices (lights, TV, kitchen appliances), turn down heating to minimum temperature (16-18°C), turn off air conditioning, close and lock all windows and doors, turn off taps tightly, wash and put away dishes, dispose of garbage properly, take personal belongings, and leave the apartment on time. Additional charges may apply for non-compliance or late departure.'
   });
 
   // Globale Einstellungen für variable Regeln
@@ -230,17 +231,7 @@ We ask our guests to vacate the accommodation by **${einheitlicheRegeln.checkout
 For stays that exceed this period without agreement, the landlord reserves the right to charge an additional fee.
 
 ### d) Check-out Duties
-${einheitlicheRegeln.checkoutPflichten.replace('Bei der Abreise sind folgende Punkte zwingend zu beachten:', 'Upon departure, the following points must be observed:')
-  .replace('Alle elektronischen Geräte (Licht, TV, Küchengeräte) ausschalten', 'Turn off all electronic devices (lights, TV, kitchen appliances)')
-  .replace('Heizung auf Mindesttemperatur (16-18°C) herunterregeln', 'Turn down heating to minimum temperature (16-18°C)')
-  .replace('Klimaanlage ausschalten', 'Turn off air conditioning')
-  .replace('alle Fenster und Türen schließen und verriegeln', 'close and lock all windows and doors')
-  .replace('Wasserhähne fest zudrehen', 'turn off taps tightly')
-  .replace('Geschirr gespült einräumen', 'wash and put away dishes')
-  .replace('Müll ordnungsgemäß entsorgen', 'dispose of garbage properly')
-  .replace('persönliche Gegenstände mitnehmen', 'take personal belongings')
-  .replace('die Wohnung rechtzeitig verlassen', 'leave the apartment on time')
-  .replace('Bei Nichteinhaltung oder verspäteter Abreise können zusätzliche Gebühren anfallen', 'Additional charges may apply for non-compliance or late departure')}
+${einheitlicheRegeln.checkoutPflichten_en}
 
 ## 📋 General Guidelines
 
@@ -1695,13 +1686,36 @@ Eine Verletzung dieser Hausordnung verstößt gegen die Mietbedingungen gemäß 
                 }}>
                   <h4 style={{ margin: '0 0 12px 0', color: styles.dark }}>🕐 Check-out Pflichten</h4>
                   
+                  {/* German Check-out Duties */}
                   <label style={{ display: 'block', fontWeight: '500', marginBottom: '8px' }}>
-                    Pflichten bei der Abreise (dieser Text erscheint in den Hausregeln):
+                    🇩🇪 Pflichten bei der Abreise (Deutsch):
                   </label>
                   <textarea
                     value={einheitlicheRegeln.checkoutPflichten}
                     onChange={(e) => updateEinheitlich('checkoutPflichten', e.target.value)}
                     placeholder="Beschreiben Sie hier die Pflichten der Gäste bei der Abreise..."
+                    style={{ 
+                      padding: '12px', 
+                      border: `1px solid ${styles.secondary}`, 
+                      borderRadius: '4px',
+                      width: '100%',
+                      minHeight: '120px',
+                      resize: 'vertical',
+                      fontFamily: 'inherit',
+                      fontSize: '14px',
+                      lineHeight: '1.4',
+                      marginBottom: '16px'
+                    }}
+                  />
+                  
+                  {/* English Check-out Duties */}
+                  <label style={{ display: 'block', fontWeight: '500', marginBottom: '8px' }}>
+                    🇬🇧 Check-out Duties (English):
+                  </label>
+                  <textarea
+                    value={einheitlicheRegeln.checkoutPflichten_en}
+                    onChange={(e) => updateEinheitlich('checkoutPflichten_en', e.target.value)}
+                    placeholder="Describe the guests' duties upon departure..."
                     style={{ 
                       padding: '12px', 
                       border: `1px solid ${styles.secondary}`, 
@@ -1720,7 +1734,7 @@ Eine Verletzung dieser Hausordnung verstößt gegen die Mietbedingungen gemäß 
                     color: styles.secondary,
                     fontStyle: 'italic'
                   }}>
-                    💡 Tipp: Der Text wird automatisch mit der Check-out Zeit ({einheitlicheRegeln.checkoutBis} Uhr) verknüpft
+                    💡 Tipp: Die Texte werden automatisch mit der Check-out Zeit ({einheitlicheRegeln.checkoutBis} Uhr) verknüpft
                   </div>
                 </div>
 
