@@ -1686,36 +1686,52 @@ Eine Verletzung dieser Hausordnung verstößt gegen die Mietbedingungen gemäß 
                 }}>
                   <h4 style={{ margin: '0 0 12px 0', color: styles.dark }}>🕐 Check-out Pflichten</h4>
                   
-                  {/* German Check-out Duties */}
-                  <label style={{ display: 'block', fontWeight: '500', marginBottom: '8px' }}>
-                    🇩🇪 Pflichten bei der Abreise (Deutsch):
-                  </label>
-                  <textarea
-                    value={einheitlicheRegeln.checkoutPflichten}
-                    onChange={(e) => updateEinheitlich('checkoutPflichten', e.target.value)}
-                    placeholder="Beschreiben Sie hier die Pflichten der Gäste bei der Abreise..."
-                    style={{ 
-                      padding: '12px', 
-                      border: `1px solid ${styles.secondary}`, 
-                      borderRadius: '4px',
-                      width: '100%',
-                      minHeight: '120px',
-                      resize: 'vertical',
-                      fontFamily: 'inherit',
-                      fontSize: '14px',
-                      lineHeight: '1.4',
-                      marginBottom: '16px'
-                    }}
-                  />
+                  {/* Language Switch Buttons */}
+                  <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+                    <button
+                      onClick={() => setLanguage('de')}
+                      style={{
+                        padding: '6px 12px',
+                        border: `1px solid ${styles.secondary}`,
+                        borderRadius: '4px',
+                        backgroundColor: language === 'de' ? styles.primary : 'white',
+                        color: language === 'de' ? 'white' : styles.dark,
+                        cursor: 'pointer',
+                        fontSize: '12px',
+                        fontWeight: '500'
+                      }}
+                    >
+                      🇩🇪 Deutsch
+                    </button>
+                    <button
+                      onClick={() => setLanguage('en')}
+                      style={{
+                        padding: '6px 12px',
+                        border: `1px solid ${styles.secondary}`,
+                        borderRadius: '4px',
+                        backgroundColor: language === 'en' ? styles.primary : 'white',
+                        color: language === 'en' ? 'white' : styles.dark,
+                        cursor: 'pointer',
+                        fontSize: '12px',
+                        fontWeight: '500'
+                      }}
+                    >
+                      🇬🇧 English
+                    </button>
+                  </div>
                   
-                  {/* English Check-out Duties */}
+                  {/* Dynamic Language Content */}
                   <label style={{ display: 'block', fontWeight: '500', marginBottom: '8px' }}>
-                    🇬🇧 Check-out Duties (English):
+                    {language === 'de' 
+                      ? 'Pflichten bei der Abreise (dieser Text erscheint in den deutschen Hausregeln):' 
+                      : 'Check-out Duties (this text appears in the English house rules):'}
                   </label>
                   <textarea
-                    value={einheitlicheRegeln.checkoutPflichten_en}
-                    onChange={(e) => updateEinheitlich('checkoutPflichten_en', e.target.value)}
-                    placeholder="Describe the guests' duties upon departure..."
+                    value={language === 'de' ? einheitlicheRegeln.checkoutPflichten : einheitlicheRegeln.checkoutPflichten_en}
+                    onChange={(e) => updateEinheitlich(language === 'de' ? 'checkoutPflichten' : 'checkoutPflichten_en', e.target.value)}
+                    placeholder={language === 'de' 
+                      ? "Beschreiben Sie hier die Pflichten der Gäste bei der Abreise..." 
+                      : "Describe the guests' duties upon departure..."}
                     style={{ 
                       padding: '12px', 
                       border: `1px solid ${styles.secondary}`, 
