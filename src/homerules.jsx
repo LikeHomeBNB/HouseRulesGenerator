@@ -321,7 +321,7 @@ Das Gebäude verfügt über unterschiedliche Parkplatzzuteilungen je Wohnung:
 
     // Pool-Bereich basierend auf globalen Einstellungen
     if (globalSettings.poolVorhanden) {
-      output += `\n## 🏊‍♂️ Pool
+      output += `\n## Pool
 
 ### a) Verfügbarkeit
 `;
