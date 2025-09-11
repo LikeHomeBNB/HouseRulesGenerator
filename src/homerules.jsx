@@ -42,7 +42,9 @@ const HausregelnGenerator = () => {
     whatsappNummer: '+49 123 456789',
     checkinVon: '15:00',
     checkinBis: '20:00',
+    checkinFlexibel: false, // Wenn true: nach Check-in-Zeit 24/7 möglich
     checkoutBis: '11:00',
+    meldebescheinigungErforderlich: true, // Check-in nur nach ausgefüllter Meldebescheinigung
     checkoutPflichten: 'Bei der Abreise sind folgende Punkte zwingend zu beachten: Alle elektronischen Geräte (Licht, TV, Küchengeräte) ausschalten, Heizung auf Mindesttemperatur (16-18°C) herunterregeln, Klimaanlage ausschalten, alle Fenster und Türen schließen und verriegeln, Wasserhähne fest zudrehen, Geschirr gespült einräumen, Müll ordnungsgemäß entsorgen, persönliche Gegenstände mitnehmen und die Wohnung rechtzeitig verlassen. Bei Nichteinhaltung oder verspäteter Abreise können zusätzliche Gebühren anfallen.'
   });
 
@@ -208,14 +210,17 @@ const HausregelnGenerator = () => {
   const generiereHausregeln = () => {
     let output = `# HAUSORDNUNG
 
-**Liebe Gäste,**
-
-wir heißen Sie herzlich willkommen in unserer Ferienwohnung und freuen uns über Ihren Aufenthalt! Damit Sie und zukünftige Gäste sich bei uns wohlfühlen können, verpflichten Sie sich mit Ihrem Aufenthalt, diesen Regeln Folge zu leisten. Danke für Ihr Verständnis.
+Herzlich willkommen! Wir freuen uns, dass du bei uns zuhause bist. Damit du dich rundum wohlfühlst und auch zukünftige Gäste das können, haben wir ein paar wichtige Punkte für dich zusammengefasst.
 
 ## 🕐 An- und Abreise
 
 ### a) Check-in
-Die Anreise erfolgt zwischen **${einheitlicheRegeln.checkinVon} Uhr und ${einheitlicheRegeln.checkinBis} Uhr**.
+${einheitlicheRegeln.checkinFlexibel ? 
+  `Die Anreise ist **jederzeit ab ${einheitlicheRegeln.checkinVon} Uhr** möglich (24/7).` : 
+  `Die Anreise erfolgt zwischen **${einheitlicheRegeln.checkinVon} Uhr und ${einheitlicheRegeln.checkinBis} Uhr**.`
+}
+
+${einheitlicheRegeln.meldebescheinigungErforderlich ? '**Wichtiger Hinweis:** Ein Check-in ist erst nach vollständiger Ausfüllung der Meldebescheinigung möglich.' : ''}
 
 ### b) Check-out
 Bei der Abreise bitten wir unsere Gäste, die Unterkunft bis spätestens **${einheitlicheRegeln.checkoutBis} Uhr** freizugeben.
@@ -1240,6 +1245,116 @@ Eine Verletzung dieser Hausordnung verstößt gegen die Mietbedingungen gemäß 
                         />
                       </div>
                     )}
+                  </div>
+                </div>
+
+                {/* Check-in & Check-out Zeiten */}
+                <div style={{
+                  backgroundColor: '#E8F5E8',
+                  padding: '16px',
+                  borderRadius: '6px',
+                  border: `1px solid ${styles.secondary}`,
+                  gridColumn: 'span 2',
+                  marginTop: '16px'
+                }}>
+                  <h4 style={{ margin: '0 0 16px 0', color: styles.dark }}>🕐 Check-in & Check-out Zeiten</h4>
+                  
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+                    {/* Check-in Von */}
+                    <div>
+                      <label style={{ display: 'block', fontWeight: '500', marginBottom: '8px' }}>
+                        Check-in ab:
+                      </label>
+                      <input
+                        type="time"
+                        value={einheitlicheRegeln.checkinVon}
+                        onChange={(e) => updateEinheitlich('checkinVon', e.target.value)}
+                        style={{ 
+                          padding: '8px', 
+                          border: `1px solid ${styles.secondary}`, 
+                          borderRadius: '4px',
+                          width: '100%'
+                        }}
+                      />
+                    </div>
+                    
+                    {/* Check-in Bis */}
+                    <div>
+                      <label style={{ display: 'block', fontWeight: '500', marginBottom: '8px' }}>
+                        Check-in bis:
+                      </label>
+                      <input
+                        type="time"
+                        value={einheitlicheRegeln.checkinBis}
+                        onChange={(e) => updateEinheitlich('checkinBis', e.target.value)}
+                        style={{ 
+                          padding: '8px', 
+                          border: `1px solid ${styles.secondary}`, 
+                          borderRadius: '4px',
+                          width: '100%'
+                        }}
+                      />
+                    </div>
+                    
+                    {/* Check-out Bis */}
+                    <div>
+                      <label style={{ display: 'block', fontWeight: '500', marginBottom: '8px' }}>
+                        Check-out bis:
+                      </label>
+                      <input
+                        type="time"
+                        value={einheitlicheRegeln.checkoutBis}
+                        onChange={(e) => updateEinheitlich('checkoutBis', e.target.value)}
+                        style={{ 
+                          padding: '8px', 
+                          border: `1px solid ${styles.secondary}`, 
+                          borderRadius: '4px',
+                          width: '100%'
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Flexible Check-in Option */}
+                  <div style={{ marginBottom: '16px' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', marginBottom: '8px' }}>
+                      <input
+                        type="checkbox"
+                        checked={einheitlicheRegeln.checkinFlexibel}
+                        onChange={(e) => updateEinheitlich('checkinFlexibel', e.target.checked)}
+                        style={{ marginRight: '8px' }}
+                      />
+                      <span style={{ fontWeight: '500' }}>Flexibler Check-in (24/7 nach Check-in-Zeit)</span>
+                    </label>
+                    <div style={{ 
+                      marginLeft: '24px',
+                      fontSize: '12px',
+                      color: styles.secondary,
+                      fontStyle: 'italic'
+                    }}>
+                      💡 Wenn aktiviert: Nach der ersten Check-in-Zeit kann 24/7 eingecheckt werden
+                    </div>
+                  </div>
+
+                  {/* Meldebescheinigung erforderlich */}
+                  <div>
+                    <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', marginBottom: '8px' }}>
+                      <input
+                        type="checkbox"
+                        checked={einheitlicheRegeln.meldebescheinigungErforderlich}
+                        onChange={(e) => updateEinheitlich('meldebescheinigungErforderlich', e.target.checked)}
+                        style={{ marginRight: '8px' }}
+                      />
+                      <span style={{ fontWeight: '500' }}>Meldebescheinigung vor Check-in erforderlich</span>
+                    </label>
+                    <div style={{ 
+                      marginLeft: '24px',
+                      fontSize: '12px',
+                      color: styles.secondary,
+                      fontStyle: 'italic'
+                    }}>
+                      💡 Check-in ist erst nach ausgefüllter Meldebescheinigung möglich
+                    </div>
                   </div>
                 </div>
 
