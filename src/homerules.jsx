@@ -378,7 +378,7 @@ Please park only in designated spaces and ensure your vehicle does not block oth
     // Continue with rest of the English template...
     output += `
 
-## 🌊 Pool Access
+## Pool Access
 
 ### a) Pool Availability
 `;
@@ -415,7 +415,7 @@ Please park only in designated spaces and ensure your vehicle does not block oth
 
     output += `
 
-## 🏡 Garden & Outdoor Areas
+## Garden & Outdoor Areas
 
 ### a) Garden Access
 `;
@@ -455,7 +455,7 @@ Please park only in designated spaces and ensure your vehicle does not block oth
 
     output += `
 
-## 📡 WiFi & Internet
+## WiFi & Internet
 
 ### a) WiFi Access
 WiFi is available in all apartments free of charge.
