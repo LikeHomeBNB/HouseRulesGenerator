@@ -28,6 +28,7 @@ const HausregelnGenerator = () => {
   const [editMode, setEditMode] = useState(null);
   const [editData, setEditData] = useState({});
   const [showApartmentManager, setShowApartmentManager] = useState(false);
+  const [language, setLanguage] = useState('de'); // 'de' or 'en'
 
   // Einheitliche Regeln (für alle gleich)
   const [einheitlicheRegeln, setEinheitlicheRegeln] = useState({
@@ -206,7 +207,329 @@ const HausregelnGenerator = () => {
     return nummern.sort().join(', ');
   };
 
-  // Hausregeln-Generator
+  // English House Rules Generator
+  const generateHouseRulesEN = () => {
+    let output = `# HOUSE RULES
+
+Welcome! We are delighted that you are staying with us. To ensure you feel completely comfortable and that future guests can do the same, we have compiled a few important points for you.
+
+## 🕐 Arrival and Departure
+
+### a) Check-in
+${einheitlicheRegeln.checkinFlexibel ? 
+  `Arrival is possible **anytime from ${einheitlicheRegeln.checkinVon}** (24/7).` : 
+  `Arrival takes place between **${einheitlicheRegeln.checkinVon} and ${einheitlicheRegeln.checkinBis}**.`
+}
+
+${einheitlicheRegeln.meldebescheinigungErforderlich ? '**Important Notice:** Check-in is only possible after complete registration form submission.' : ''}
+
+### b) Check-out
+We ask our guests to vacate the accommodation by **${einheitlicheRegeln.checkoutBis}** at the latest.
+
+### c) Delays
+For stays that exceed this period without agreement, the landlord reserves the right to charge an additional fee.
+
+### d) Check-out Duties
+${einheitlicheRegeln.checkoutPflichten.replace('Bei der Abreise sind folgende Punkte zwingend zu beachten:', 'Upon departure, the following points must be observed:')
+  .replace('Alle elektronischen Geräte (Licht, TV, Küchengeräte) ausschalten', 'Turn off all electronic devices (lights, TV, kitchen appliances)')
+  .replace('Heizung auf Mindesttemperatur (16-18°C) herunterregeln', 'Turn down heating to minimum temperature (16-18°C)')
+  .replace('Klimaanlage ausschalten', 'Turn off air conditioning')
+  .replace('alle Fenster und Türen schließen und verriegeln', 'close and lock all windows and doors')
+  .replace('Wasserhähne fest zudrehen', 'turn off taps tightly')
+  .replace('Geschirr gespült einräumen', 'wash and put away dishes')
+  .replace('Müll ordnungsgemäß entsorgen', 'dispose of garbage properly')
+  .replace('persönliche Gegenstände mitnehmen', 'take personal belongings')
+  .replace('die Wohnung rechtzeitig verlassen', 'leave the apartment on time')
+  .replace('Bei Nichteinhaltung oder verspäteter Abreise können zusätzliche Gebühren anfallen', 'Additional charges may apply for non-compliance or late departure')}
+
+## 📋 General Guidelines
+
+### a) Legal Basis
+The house rules are linked to the rental agreement, and in case of non-compliance with the house rules, the landlord reserves the right to terminate the rental agreement or withhold part of the deposit.
+
+### b) Scope of Application
+All guests (and visitors) must follow the house rules and other instructions from the landlord.
+
+## 🔇 Noise Disturbance and Quiet Hours
+
+### a) Quiet Hours
+During the period from **${einheitlicheRegeln.nachtruheVon} to ${einheitlicheRegeln.nachtruheBis}**, quiet hours apply in the building. During this time, it is important to behave quietly, not cause loud noise, and be considerate of other guests.
+
+### b) Children
+${einheitlicheRegeln.kinderGeeignet 
+  ? 'These holiday apartments are suitable for children of all ages.' 
+  : 'These holiday apartments are not suitable for children.'} Legal guardians are responsible for the safety and behavior of children at all times.
+
+### c) Noise Protection
+Excessive noise and parties are prohibited at all times of day and night and can result in termination of the rental agreement, eviction from the holiday apartment, and possible additional costs.
+
+### d) Neighborhood Respect
+Please be considerate of neighbors and other guests. Loud conversations, music, or television after quiet hours are not permitted.
+
+## 🚭 Smoking Regulations
+
+### a) Smoking in the Apartment
+${einheitlicheRegeln.rauchenErlaubt 
+  ? 'Smoking is permitted in the apartments.' 
+  : 'Smoking is strictly prohibited in all apartments.'}
+
+${!einheitlicheRegeln.rauchenErlaubt && einheitlicheRegeln.rauchenBalkonErlaubt 
+  ? '### b) Smoking on Balcony/Terrace\nSmoking is permitted on balconies and terraces. Please ensure that cigarette butts are properly disposed of and ashtrays are used.' 
+  : !einheitlicheRegeln.rauchenErlaubt 
+    ? '### b) Complete Smoking Ban\nSmoking is not permitted anywhere on the property, including balconies and terraces.' 
+    : ''}
+
+${!einheitlicheRegeln.rauchenErlaubt 
+  ? '### c) Violation Consequences\nViolation of the smoking ban will result in additional cleaning costs and may lead to immediate termination of the rental agreement.' 
+  : ''}
+
+## 🐕 Pet Policy
+
+### a) Pet Permission
+${einheitlicheRegeln.haustiereErlaubt 
+  ? 'Pets are allowed in our accommodations.' 
+  : 'Pets are not permitted in our accommodations.'}
+
+${einheitlicheRegeln.haustiereErlaubt ? `
+### b) Pet Responsibilities  
+Pet owners are fully responsible for their animals and must ensure they do not disturb other guests or cause damage.
+
+### c) Pet Fees
+${(() => {
+  let petFeeText = '';
+  if (globalSettings.hundegebuehrUnterschiedlich) {
+    const hundegruppen = gruppiereNachWert('hundegebuehr');
+    Object.entries(hundegruppen).forEach(([gebuehr, apartmentNummern]) => {
+      if (parseInt(gebuehr) > 0) {
+        petFeeText += `- **€${gebuehr} per stay:** Apartments ${formatWohnungsListe(apartmentNummern)}\n`;
+      } else {
+        petFeeText += `- **No fee:** Apartments ${formatWohnungsListe(apartmentNummern)}\n`;
+      }
+    });
+  } else {
+    const gebuehr = globalSettings.hundegebuehrGlobal;
+    const alleNummern = wohnungen.map(w => w.nummer);
+    if (gebuehr > 0) {
+      petFeeText += `All apartments: €${gebuehr} per stay\n`;
+    } else {
+      petFeeText += `No pet fees for any apartments\n`;
+    }
+  }
+  return petFeeText;
+})()}
+
+### d) Cleaning Requirements
+Additional cleaning costs may apply if pet hair or odors require special cleaning attention.` : ''}
+
+## 🚗 Parking
+
+### a) Parking Availability
+`;
+
+    if (globalSettings.parkplaetzeVorhanden) {
+      if (globalSettings.parkplaetzeUnterschiedlich) {
+        const parkplatzGruppen = gruppiereNachWert('parkplaetze');
+        Object.entries(parkplatzGruppen).forEach(([anzahl, apartmentNummern]) => {
+          if (parseInt(anzahl) === 0) {
+            output += `- **No parking spaces:** Apartments ${formatWohnungsListe(apartmentNummern)} - Guests can use public parking in the area\n`;
+          } else if (parseInt(anzahl) === 1) {
+            output += `- **1 parking space:** Apartments ${formatWohnungsListe(apartmentNummern)}\n`;
+          } else {
+            output += `- **${anzahl} parking spaces:** Apartments ${formatWohnungsListe(apartmentNummern)}\n`;
+          }
+        });
+      } else {
+        const anzahl = globalSettings.parkplaetzeGlobal;
+        const alleNummern = wohnungen.map(w => w.nummer);
+        if (anzahl === 0) {
+          output += `- **No parking spaces:** All apartments - Guests can use public parking in the area\n`;
+        } else if (anzahl === 1) {
+          output += `All apartments have 1 parking space: ${formatWohnungsListe(alleNummern)}\n`;
+        } else {
+          output += `All apartments have ${anzahl} parking spaces: ${formatWohnungsListe(alleNummern)}\n`;
+        }
+      }
+      
+      output += `
+### b) Parking Fees
+`;
+      
+      if (globalSettings.parkplaetzeKostenpflichtig) {
+        if (globalSettings.parkplatzgebuehrUnterschiedlich) {
+          const gebuehrGruppen = gruppiereNachWert('parkplatzgebuehr');
+          Object.entries(gebuehrGruppen).forEach(([gebuehr, apartmentNummern]) => {
+            output += `- **€${gebuehr} per day:** Apartments ${formatWohnungsListe(apartmentNummern)}\n`;
+          });
+        } else {
+          const alleNummern = wohnungen.map(w => w.nummer);
+          output += `All apartments: €${globalSettings.parkplatzgebuehrGlobal} per day\n`;
+        }
+      } else {
+        output += `Parking is free of charge for all apartments.\n`;
+      }
+      
+      output += `
+### c) Parking Rules
+Please park only in designated spaces and ensure your vehicle does not block other guests or access roads.`;
+    } else {
+      output += `No parking spaces are available at the property. Guests must use public parking in the surrounding area.`;
+    }
+
+    // Continue with rest of the English template...
+    output += `
+
+## 🌊 Pool Access
+
+### a) Pool Availability
+`;
+
+    if (globalSettings.poolVorhanden) {
+      if (globalSettings.poolUnterschiedlich) {
+        const poolGruppen = gruppiereNachWert('pool');
+        Object.entries(poolGruppen).forEach(([zugang, apartmentNummern]) => {
+          if (zugang === 'true') {
+            output += `Apartments with pool access: ${formatWohnungsListe(apartmentNummern)}\n`;
+          } else {
+            output += `Apartments without pool access: ${formatWohnungsListe(apartmentNummern)}\n`;
+          }
+        });
+      } else {
+        const alleNummern = wohnungen.map(w => w.nummer);
+        if (globalSettings.poolGlobal) {
+          output += `All apartments have pool access: ${formatWohnungsListe(alleNummern)}\n`;
+        } else {
+          output += `No apartments have pool access: ${formatWohnungsListe(alleNummern)}\n`;
+        }
+      }
+      
+      output += `
+### b) Pool Rules
+- Pool hours: Usually from sunrise to sunset
+- Children must be supervised at all times
+- No glass containers in pool area
+- Please shower before entering the pool
+- Pool use at your own risk`;
+    } else {
+      output += `No pool is available at this property.`;
+    }
+
+    output += `
+
+## 🏡 Garden & Outdoor Areas
+
+### a) Garden Access
+`;
+
+    if (globalSettings.gartenVorhanden) {
+      if (globalSettings.gartenUnterschiedlich) {
+        const gartenGruppen = gruppiereNachWert('garten');
+        Object.entries(gartenGruppen).forEach(([typ, apartmentNummern]) => {
+          if (typ === 'gemeinschaft') {
+            output += `Apartments with shared garden access: ${formatWohnungsListe(apartmentNummern)}\n`;
+          } else if (typ === 'privat') {
+            output += `Apartments with private garden: ${formatWohnungsListe(apartmentNummern)}\n`;
+          } else {
+            output += `Apartments without garden access: ${formatWohnungsListe(apartmentNummern)}\n`;
+          }
+        });
+      } else {
+        const alleNummern = wohnungen.map(w => w.nummer);
+        if (globalSettings.gartenGlobal === 'gemeinschaft') {
+          output += `All apartments have shared garden access: ${formatWohnungsListe(alleNummern)}\n`;
+        } else if (globalSettings.gartenGlobal === 'privat') {
+          output += `All apartments have private garden: ${formatWohnungsListe(alleNummern)}\n`;
+        } else {
+          output += `No garden access for any apartments: ${formatWohnungsListe(alleNummern)}\n`;
+        }
+      }
+      
+      output += `
+### b) Garden Rules
+- Please keep the garden clean and tidy
+- Respect plants and outdoor furniture
+- Quiet hours also apply to outdoor areas
+- No loud music or parties in garden areas`;
+    } else {
+      output += `No garden or outdoor areas are available.`;
+    }
+
+    output += `
+
+## 📡 WiFi & Internet
+
+### a) WiFi Access
+WiFi is available in all apartments free of charge.
+
+### b) Usage Guidelines
+Please use the internet responsibly and refrain from illegal downloads or streaming that may slow down the connection for other guests.
+
+### c) Password Security
+Do not share WiFi passwords with unauthorized persons.
+
+### d) Blocking
+In case of misuse, the landlord reserves the right to block WiFi access for the guest.
+
+## 🔍 Surveillance & Privacy
+
+### a) Privacy Policy
+Data processing is GDPR compliant. All collected data serves exclusively for security, property protection, and compliance with house rules.
+
+${globalSettings.lautstaerkemessung ? `### b) Volume Monitoring
+Devices for volume monitoring are installed in the apartments. These serve to monitor compliance with quiet hours and noise protection regulations. The measurement data is stored for ${globalSettings.lautstaerkeSpeicherdauer} days and then automatically deleted.
+
+**Important Note:** Only volume levels are measured, no conversations are recorded.` : ''}
+
+${globalSettings.rauchdetektoren ? `### ${globalSettings.lautstaerkemessung ? 'c' : 'b'}) Smoke Detectors
+The apartments are equipped with smoke detectors${globalSettings.rauchdetektor_datenspeicherung ? ', which store alarm events with date and time' : ''}. These serve fire protection and the safety of all guests.` : ''}
+
+${globalSettings.kameras_gemeinschaftsbereiche ? `### ${(globalSettings.lautstaerkemessung ? 1 : 0) + (globalSettings.rauchdetektoren ? 1 : 0) === 2 ? 'd' : (globalSettings.lautstaerkemessung || globalSettings.rauchdetektoren) ? 'c' : 'b'}) Video Surveillance
+Surveillance cameras are installed in the following common areas: **${globalSettings.kamera_standorte}**.
+
+**Important Information:**
+- No private or residential areas are monitored
+- Recordings serve security and property protection
+- Storage period according to legal requirements
+- Recordings can be viewed with legitimate interest` : ''}
+
+### ${['b', 'c', 'd', 'e'][(globalSettings.lautstaerkemessung ? 1 : 0) + (globalSettings.rauchdetektoren ? 1 : 0) + (globalSettings.kameras_gemeinschaftsbereiche ? 1 : 0)]}) Data Protection Rights
+Guests have the right to information, correction, and deletion of their personal data according to GDPR. For questions about data protection, please contact the landlord.
+
+## 🛠️ Damages & Theft
+
+### a) Damage Reporting
+All damages, defects, or problems must be reported **immediately** to the landlord. This includes minor damages such as clogged drains, defective appliances, or damaged furnishings.
+
+**Damage reports via WhatsApp:** ${einheitlicheRegeln.whatsappNummer}
+
+### b) Liability for Damages
+Guests are fully liable for all damages caused during their stay. This includes repair costs, replacement procurement, and any necessary special cleaning.
+
+### c) Theft and Vandalism
+In case of theft or willful damage, replacement costs, repair costs, and lost rental income will be charged.
+
+### d) Loss of Keys
+In case of key loss, costs for locksmith services, lock changes, and new keys will be charged. Keys must not be left unattended.
+
+### e) Immediate Blocking
+In case of serious damage or theft, the landlord reserves the right to immediately terminate the rental agreement and demand evacuation of the apartment.
+
+## 🆘 Emergency Information
+
+### a) Emergency Contact
+In case of an emergency, you can reach the landlord as follows:
+
+**Name:** ${einheitlicheRegeln.vermieeterName}  
+**Phone:** ${einheitlicheRegeln.vermieterTelefon}
+
+## ✅ Consent
+
+A violation of this house order violates the rental conditions according to the rental agreement. The landlord reserves the right to terminate the rental agreement and evict guests who refuse to comply with the house rules from the apartment.
+`;
+
+    return output;
+  };
+
+  // German House Rules Generator (original)
   const generiereHausregeln = () => {
     let output = `# HAUSORDNUNG
 
@@ -567,8 +890,8 @@ Eine Verletzung dieser Hausordnung verstößt gegen die Mietbedingungen gemäß 
     const maxLineWidth = pageWidth - (margin * 2);
     let currentY = margin;
     
-    // Hausregeln-Text generieren
-    const hausregelnText = generiereHausregeln();
+    // Hausregeln-Text generieren based on selected language
+    const hausregelnText = language === 'en' ? generateHouseRulesEN() : generiereHausregeln();
     
     // Emojis komplett entfernen
     const emojisToRemove = ['📋', '🔇', '🚗', '🌊', '🌳', '🚭', '🐕', '🚫', '📶', '🔍', '💥', '🕐', '🆘', '✅', '🛠️'];
@@ -587,15 +910,16 @@ Eine Verletzung dieser Hausordnung verstößt gegen die Mietbedingungen gemäß 
       let line = lines[i].trim();
       
       // Ersten Titel überspringen
-      if (skipFirstTitle && line.startsWith('# HAUSORDNUNG')) {
+      if (skipFirstTitle && (line.startsWith('# HAUSORDNUNG') || line.startsWith('# HOUSE RULES'))) {
         skipFirstTitle = false;
         
-        // Titel manuell setzen (mittig)
+        // Titel manuell setzen (mittig) - depends on language
+        const title = language === 'en' ? 'HOUSE RULES' : 'HAUSORDNUNG';
         doc.setFont("helvetica", "bold");
         doc.setFontSize(18);
-        const titleWidth = doc.getTextWidth("HAUSORDNUNG");
+        const titleWidth = doc.getTextWidth(title);
         const titleX = (pageWidth - titleWidth) / 2;
-        doc.text("HAUSORDNUNG", titleX, currentY);
+        doc.text(title, titleX, currentY);
         currentY += 15;
         continue;
       }
@@ -654,7 +978,9 @@ Eine Verletzung dieser Hausordnung verstößt gegen die Mietbedingungen gemäß 
     }
     
     // PDF speichern
-    const fileName = `Hausregeln_${wohnungen.length}_Wohnungen_${new Date().toLocaleDateString('de-DE').replace(/\./g, '-')}.pdf`;
+    const baseFileName = language === 'en' ? 'House_Rules' : 'Hausregeln';
+    const apartmentText = language === 'en' ? 'Apartments' : 'Wohnungen';
+    const fileName = `${baseFileName}_${wohnungen.length}_${apartmentText}_${new Date().toLocaleDateString('de-DE').replace(/\./g, '-')}.pdf`;
     doc.save(fileName);
   };
 
@@ -2129,27 +2455,50 @@ Eine Verletzung dieser Hausordnung verstößt gegen die Mietbedingungen gemäß 
                 fontFamily: 'DM Sans, sans-serif',
                 fontSize: '24px'
               }}>
-                📄 Finale Hausregeln (Gruppiert)
+                📄 {language === 'en' ? 'Final House Rules (Grouped)' : 'Finale Hausregeln (Gruppiert)'}
               </h2>
-              <button 
-                onClick={exportPDF}
-                style={{
-                  padding: '12px 24px',
-                  backgroundColor: styles.primary,
-                  color: styles.white,
-                  border: 'none',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  fontSize: '16px',
-                  fontWeight: '600'
-                }}
-              >
-                <Download size={20} />
-                PDF Export
-              </button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                {/* Language Selector */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <label style={{ fontSize: '14px', fontWeight: '500', color: styles.dark }}>
+                    🌍 Sprache:
+                  </label>
+                  <select
+                    value={language}
+                    onChange={(e) => setLanguage(e.target.value)}
+                    style={{
+                      padding: '8px 12px',
+                      border: `1px solid ${styles.secondary}`,
+                      borderRadius: '6px',
+                      fontSize: '14px',
+                      backgroundColor: 'white',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <option value="de">🇩🇪 Deutsch</option>
+                    <option value="en">🇬🇧 English</option>
+                  </select>
+                </div>
+                <button 
+                  onClick={exportPDF}
+                  style={{
+                    padding: '12px 24px',
+                    backgroundColor: styles.primary,
+                    color: styles.white,
+                    border: 'none',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    fontSize: '16px',
+                    fontWeight: '600'
+                  }}
+                >
+                  <Download size={20} />
+                  PDF Export
+                </button>
+              </div>
             </div>
             
             <pre style={{
@@ -2163,7 +2512,7 @@ Eine Verletzung dieser Hausordnung verstößt gegen die Mietbedingungen gemäß 
               border: `1px solid ${styles.secondary}`,
               fontFamily: 'Monaco, Courier, monospace'
             }}>
-              {generiereHausregeln()}
+              {language === 'en' ? generateHouseRulesEN() : generiereHausregeln()}
             </pre>
           </div>
         )}
