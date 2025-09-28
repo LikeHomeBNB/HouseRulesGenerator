@@ -548,7 +548,7 @@ ${einheitlicheRegeln.checkoutPflichten}
 ## 📋 Allgemeine Richtlinien
 
 ### a) Rechtliche Grundlage
-Die Hausregeln sind an den Mietvertrag gekoppelt und bei Nichteinhaltung der Hausregeln behält sich der Vermieter das Recht vor, den Mietvertrag aufzulösen oder einen Teil der Kaution einzubehalten.
+Die Hausregeln sind an den Mietvertrag gekoppelt und bei Nichteinhaltung der Hausregeln behält sich der Vermieter das Recht vor, den Mietvertrag aufzulösen oder Vertragsstrafen zu erheben.
 
 ### b) Geltungsbereich
 Alle Gäste (und Besucher) müssen den Hausregeln und weiteren Anweisungen des Vermieters folgen.
@@ -751,7 +751,7 @@ Das Rauchen ist ${einheitlicheRegeln.rauchenErlaubt ? 'in den Ferienwohnungen er
 Bei Verstoß gegen das Rauchverbot wird eine Vertragsstrafe von **200€** für die erforderliche Sonderreinigung erhoben. Dies erfolgt zusätzlich zu eventuellen Schadensersatzforderungen.
 
 ### c) Entsorgung
-Zigarettenstummel müssen ordnungsgemäß entsorgt werden und dürfen nicht auf das Grundstück geworfen werden. Nichtbeachtung führt zu Bußgeld/Abzug der Kaution.
+Zigarettenstummel müssen ordnungsgemäß entsorgt werden und dürfen nicht auf das Grundstück geworfen werden. Nichtbeachtung führt zu einer Reinigungsgebühr von 50€.
 
 ## 🐕 Haustiere
 
