@@ -545,6 +545,9 @@ Für Aufenthalte, die unvereinbart diesen Zeitraum überschreiten, nimmt sich de
 ### d) Check-out Pflichten
 ${einheitlicheRegeln.checkoutPflichten}
 
+### e) Zusätzliche Personen
+Zusätzliche Personen über die ursprünglich angemeldete Anzahl hinaus müssen **sofort** beim Vermieter gemeldet werden. Für jede zusätzliche Person wird ein Aufpreis berechnet. Nicht angemeldete zusätzliche Personen können zur sofortigen Kündigung des Mietvertrags führen.
+
 ## 📋 Allgemeine Richtlinien
 
 ### a) Rechtliche Grundlage
