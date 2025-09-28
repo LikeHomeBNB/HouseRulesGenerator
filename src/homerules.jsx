@@ -751,7 +751,7 @@ Bitte duschen Sie sich, bevor Sie den Pool betreten.
 Das Rauchen ist ${einheitlicheRegeln.rauchenErlaubt ? 'in den Ferienwohnungen erlaubt' : 'in den Ferienwohnungen nicht erlaubt'}${!einheitlicheRegeln.rauchenErlaubt && einheitlicheRegeln.rauchenBalkonErlaubt ? ', jedoch auf Balkonen/Terrassen gestattet' : ''}.
 
 ### b) Vertragsstrafe
-Bei Verstoß gegen das Rauchverbot wird eine Vertragsstrafe von **200€** für die erforderliche Sonderreinigung erhoben. Dies erfolgt zusätzlich zu eventuellen Schadensersatzforderungen.
+Bei Verstoß gegen das Rauchverbot wird eine Vertragsstrafe von **500€** für die erforderliche Sonderreinigung erhoben. Dies erfolgt zusätzlich zu eventuellen Schadensersatzforderungen.
 
 ### c) Entsorgung
 Zigarettenstummel müssen ordnungsgemäß entsorgt werden und dürfen nicht auf das Grundstück geworfen werden. Nichtbeachtung führt zu einer Reinigungsgebühr von 50€.
@@ -795,7 +795,7 @@ Fotoshootings, Videodrehs oder ähnliche kommerzielle Produktionen sind nur mit 
 Prostitution und damit verbundene Aktivitäten sind in den Räumlichkeiten strengstens verboten.
 
 ### d) Vertragsstrafe
-Bei Verstoß gegen diese Regelungen wird eine Vertragsstrafe von **250€** erhoben. Dies erfolgt zusätzlich zu eventuellen Schadensersatzforderungen.
+Bei Verstoß gegen diese Regelungen wird eine Vertragsstrafe von **500€** erhoben. Dies erfolgt zusätzlich zu eventuellen Schadensersatzforderungen.
 
 ## 📶 WLAN
 
