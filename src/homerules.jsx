@@ -556,20 +556,20 @@ Die Hausregeln sind an den Mietvertrag gekoppelt und bei Nichteinhaltung der Hau
 ### b) Geltungsbereich
 Alle Gäste (und Besucher) müssen den Hausregeln und weiteren Anweisungen des Vermieters folgen.
 
+### c) Kinder
+${einheitlicheRegeln.kinderGeeignet 
+  ? 'Diese Ferienwohnungen sind für Kinder aller Altersgruppen geeignet.' 
+  : 'Diese Ferienwohnungen sind nicht für Kinder geeignet.'} Erziehungsberechtigte sind für die Sicherheit und das Verhalten der Kinder jederzeit verantwortlich.
+
 ## 🔇 Lärmbelästigung und Nachtruhe
 
 ### a) Nachtruhe
 In der Zeit von **${einheitlicheRegeln.nachtruheVon} Uhr bis ${einheitlicheRegeln.nachtruheBis} Uhr** gilt Nachtruhe im Gebäude. Zu dieser Zeit gilt es sich ruhig zu verhalten, keinen starken Lärm zu verursachen und auf andere Gäste Rücksicht zu nehmen.
 
-### b) Kinder
-${einheitlicheRegeln.kinderGeeignet 
-  ? 'Diese Ferienwohnungen sind für Kinder aller Altersgruppen geeignet.' 
-  : 'Diese Ferienwohnungen sind nicht für Kinder geeignet.'} Erziehungsberechtigte sind für die Sicherheit und das Verhalten der Kinder jederzeit verantwortlich.
-
-### c) Lärmschutz
+### b) Lärmschutz
 Übermäßiger Lärm und Partys sind zu jeder Tages- und Nachtzeit untersagt und können dazu führen, dass der Mietvertrag gekündigt wird, dass die Ferienwohnung verlassen werden muss und dass ggf. zusätzliche Kosten anfallen.
 
-### d) Nachbarschaftsrespekt
+### c) Nachbarschaftsrespekt
 Wir bitten unsere Gäste und ihre Besucher um einen respektvollen Umgang mit den Anwohnern und Nachbarn.
 
 ## 🚗 Parkmöglichkeiten
