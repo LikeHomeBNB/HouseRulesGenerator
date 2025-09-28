@@ -848,10 +848,13 @@ Gäste haften vollumfänglich für alle während ihres Aufenthalts verursachten 
 ### c) Diebstahl und Vandalismus
 Bei Diebstahl oder mutwilliger Beschädigung werden Wiederbeschaffungskosten, Reparaturkosten und entgangene Mieteinnahmen in Rechnung gestellt.
 
-### d) Verlust von Schlüsseln
-Bei Schlüsselverlust werden Kosten für Schlüsseldienst, Schlosswechsel und neue Schlüssel berechnet. Schlüssel dürfen nicht unbeaufsichtigt gelassen werden.
+### d) Vertraulichkeit von Schlüsseln und Zugangscodes
+Schlüssel und Zugangscodes sind streng vertraulich zu behandeln und dürfen unter keinen Umständen an Dritte weitergegeben werden. Dies gilt auch für Familienmitglieder, Freunde oder andere Gäste, die nicht im Mietvertrag aufgeführt sind.
 
-### e) Sofortige Sperrung
+### e) Verlust von Schlüsseln
+Bei Schlüsselverlust werden Kosten für Schlüsseldienst, Schlosswechsel und neue Schlüssel dem Gast in Rechnung gestellt. Schlüssel dürfen nicht unbeaufsichtigt gelassen werden.
+
+### f) Sofortige Sperrung
 Bei schwerwiegenden Schäden oder Diebstahl behält sich der Vermieter das Recht vor, den Mietvertrag sofort zu kündigen und die Räumung der Wohnung zu verlangen.
 
 ## 🆘 Notfallinformationen
