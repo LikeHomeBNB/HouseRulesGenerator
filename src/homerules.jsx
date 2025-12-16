@@ -46,8 +46,8 @@ const HausregelnGenerator = () => {
     checkinFlexibel: false, // Wenn true: nach Check-in-Zeit 24/7 möglich
     checkoutBis: '11:00',
     meldebescheinigungErforderlich: true, // Check-in nur nach ausgefüllter Meldebescheinigung
-    checkoutPflichten: 'Bei der Abreise sind folgende Punkte zwingend zu beachten: Alle elektronischen Geräte (Licht, TV, Küchengeräte) ausschalten, Heizung auf Mindesttemperatur (16-18°C) herunterregeln, Klimaanlage ausschalten, alle Fenster und Türen schließen und verriegeln, Wasserhähne fest zudrehen, Geschirr gespült einräumen, Müll ordnungsgemäß entsorgen, persönliche Gegenstände mitnehmen und die Wohnung rechtzeitig verlassen. Bei Nichteinhaltung oder verspäteter Abreise können zusätzliche Gebühren anfallen.',
-    checkoutPflichten_en: 'Upon departure, the following points must be observed: Turn off all electronic devices (lights, TV, kitchen appliances), turn down heating to minimum temperature (16-18°C), turn off air conditioning, close and lock all windows and doors, turn off taps tightly, wash and put away dishes, dispose of garbage properly, take personal belongings, and leave the apartment on time. Additional charges may apply for non-compliance or late departure.'
+    checkoutPflichten: 'Bei der Abreise sind folgende Punkte zwingend zu beachten: Alle elektronischen Geräte (Licht, TV, Küchengeräte) ausschalten, Heizung auf Mindesttemperatur (16-18°C) herunterregeln, Klimaanlage ausschalten, alle Fenster und Türen schließen und verriegeln, Wasserhähne fest zudrehen, Geschirr gespült einräumen, Müll ordnungsgemäß entsorgen, persönliche Gegenstände mitnehmen und die Wohnung rechtzeitig verlassen.',
+    checkoutPflichten_en: 'Upon departure, the following points must be observed: Turn off all electronic devices (lights, TV, kitchen appliances), turn down heating to minimum temperature (16-18°C), turn off air conditioning, close and lock all windows and doors, turn off taps tightly, wash and put away dishes, dispose of garbage properly, take personal belongings, and leave the apartment on time.'
   });
 
   // Globale Einstellungen für variable Regeln
@@ -66,7 +66,7 @@ const HausregelnGenerator = () => {
     gartenUnterschiedlich: true,
     gartenGlobal: 'gemeinschaft', // Wert wenn nicht unterschiedlich
     hundegebuehrUnterschiedlich: false,
-    hundegebuehrGlobal: 25, // Euro pro Aufenthalt
+    hundegebuehrGlobal: 15, // Euro pro Aufenthalt
     // Überwachung & Datenschutz
     lautstaerkemessung: true,
     lautstaerkeSpeicherdauer: 30, // Tage
@@ -106,13 +106,13 @@ const HausregelnGenerator = () => {
       7: 'keiner'       // 305: Kein Garten
     },
     hundegebuehr: {
-      1: 25, // 101: 25€ Hundegebühr
-      2: 25, // 102: 25€ Hundegebühr
-      3: 30, // 201: 30€ Hundegebühr
-      4: 30, // 202: 30€ Hundegebühr
-      5: 35, // 301: 35€ Hundegebühr
-      6: 35, // 302: 35€ Hundegebühr
-      7: 40  // 305: 40€ Hundegebühr
+      1: 15, // 101: 15€ Hundegebühr
+      2: 15, // 102: 15€ Hundegebühr
+      3: 15, // 201: 15€ Hundegebühr
+      4: 15, // 202: 15€ Hundegebühr
+      5: 15, // 301: 15€ Hundegebühr
+      6: 15, // 302: 15€ Hundegebühr
+      7: 15  // 305: 15€ Hundegebühr
     },
     parkplatzgebuehr: {
       1: 10, // 101: 10€ pro Tag
@@ -151,7 +151,7 @@ const HausregelnGenerator = () => {
         parkplaetze: { ...prev.parkplaetze, [newId]: 1 },
         pool: { ...prev.pool, [newId]: false },
         garten: { ...prev.garten, [newId]: 'gemeinschaft' },
-        hundegebuehr: { ...prev.hundegebuehr, [newId]: 25 },
+        hundegebuehr: { ...prev.hundegebuehr, [newId]: 15 },
         parkplatzgebuehr: { ...prev.parkplatzgebuehr, [newId]: 10 }
       }));
       
@@ -228,15 +228,18 @@ ${einheitlicheRegeln.meldebescheinigungErforderlich ? '**Important Notice:** Che
 We ask our guests to vacate the accommodation by **${einheitlicheRegeln.checkoutBis}** at the latest.
 
 ### c) Delays
-For stays that exceed this period without agreement, the landlord reserves the right to charge an additional fee.
+Please adhere to the agreed check-in and check-out times.
 
 ### d) Check-out Duties
 ${einheitlicheRegeln.checkoutPflichten_en}
 
+### e) Additional Persons
+Additional persons beyond the originally registered number must be reported to the landlord **immediately**.
+
 ## 📋 General Guidelines
 
 ### a) Legal Basis
-The house rules are linked to the rental agreement, and in case of non-compliance with the house rules, the landlord reserves the right to terminate the rental agreement or withhold part of the deposit.
+The house rules are linked to the rental agreement and must be complied with.
 
 ### b) Scope of Application
 All guests (and visitors) must follow the house rules and other instructions from the landlord.
@@ -252,7 +255,7 @@ ${einheitlicheRegeln.kinderGeeignet
   : 'These holiday apartments are not suitable for children.'} Legal guardians are responsible for the safety and behavior of children at all times.
 
 ### c) Noise Protection
-Excessive noise and parties are prohibited at all times of day and night and can result in termination of the rental agreement, eviction from the holiday apartment, and possible additional costs.
+Excessive noise and parties are prohibited at all times of day and night.
 
 ### d) Neighborhood Respect
 Please be considerate of neighbors and other guests. Loud conversations, music, or television after quiet hours are not permitted.
@@ -270,9 +273,6 @@ ${!einheitlicheRegeln.rauchenErlaubt && einheitlicheRegeln.rauchenBalkonErlaubt
     ? '### b) Complete Smoking Ban\nSmoking is not permitted anywhere on the property, including balconies and terraces.' 
     : ''}
 
-${!einheitlicheRegeln.rauchenErlaubt 
-  ? '### c) Violation Consequences\nViolation of the smoking ban will result in additional cleaning costs and may lead to immediate termination of the rental agreement.' 
-  : ''}
 
 ## 🐕 Pet Policy
 
@@ -457,9 +457,6 @@ Please use the internet responsibly and refrain from illegal downloads or stream
 ### c) Password Security
 Do not share WiFi passwords with unauthorized persons.
 
-### d) Blocking
-In case of misuse, the landlord reserves the right to block WiFi access for the guest.
-
 ## 🔍 Surveillance & Privacy
 
 ### a) Privacy Policy
@@ -501,20 +498,39 @@ In case of theft or willful damage, replacement costs, repair costs, and lost re
 ### d) Loss of Keys
 In case of key loss, costs for locksmith services, lock changes, and new keys will be charged. Keys must not be left unattended.
 
-### e) Immediate Blocking
-In case of serious damage or theft, the landlord reserves the right to immediately terminate the rental agreement and demand evacuation of the apartment.
-
 ## 🆘 Emergency Information
 
 ### a) Emergency Contact
 In case of an emergency, you can reach the landlord as follows:
 
-**Name:** ${einheitlicheRegeln.vermieeterName}  
+**Name:** ${einheitlicheRegeln.vermieeterName}
 **Phone:** ${einheitlicheRegeln.vermieterTelefon}
 
-## ✅ Consent
+## ⚖️ Contract Penalties and Consequences
 
-A violation of this house order violates the rental conditions according to the rental agreement. The landlord reserves the right to terminate the rental agreement and evict guests who refuse to comply with the house rules from the apartment.
+In case of violations of the house rules, the following measures may be taken:
+
+### a) Contract Penalties
+- **Smoking in non-smoking apartments:** Contract penalty of €500 for required special cleaning
+- **Noise disturbance/parties:** Contract penalty of €500
+- **Commercial use without permission:** Contract penalty of €500
+
+### b) Additional Fees
+- **Late departure:** Additional fee for exceeding check-out time
+- **Unregistered guests:** Additional fee per extra person or immediate termination
+- **Improper waste disposal:** Cleaning fee of €50
+- **Damage caused by pets:** Additional cleaning fees
+
+### c) Contract Termination
+In case of serious violations (theft, significant damage, repeated non-compliance), the landlord reserves the right to immediately terminate the rental agreement and demand evacuation of the apartment.
+
+---
+
+We wish you a pleasant stay and are delighted to welcome you as our guest!
+
+If you have any questions or concerns, please feel free to contact us at any time.
+
+**Your ${einheitlicheRegeln.vermieeterName} Team**
 `;
 
     return output;
@@ -540,18 +556,18 @@ ${einheitlicheRegeln.meldebescheinigungErforderlich ? '**Wichtiger Hinweis:** Ei
 Bei der Abreise bitten wir unsere Gäste, die Unterkunft bis spätestens **${einheitlicheRegeln.checkoutBis} Uhr** freizugeben.
 
 ### c) Verspätungen
-Für Aufenthalte, die unvereinbart diesen Zeitraum überschreiten, nimmt sich der Vermieter das Recht heraus, einen Aufpreis zu verlangen.
+Bitte halten Sie die vereinbarten Check-in- und Check-out-Zeiten ein.
 
 ### d) Check-out Pflichten
 ${einheitlicheRegeln.checkoutPflichten}
 
 ### e) Zusätzliche Personen
-Zusätzliche Personen über die ursprünglich angemeldete Anzahl hinaus müssen **sofort** beim Vermieter gemeldet werden. Für jede zusätzliche Person wird ein Aufpreis berechnet. Nicht angemeldete zusätzliche Personen können zur sofortigen Kündigung des Mietvertrags führen.
+Zusätzliche Personen über die ursprünglich angemeldete Anzahl hinaus müssen **sofort** beim Vermieter gemeldet werden.
 
 ## 📋 Allgemeine Richtlinien
 
 ### a) Rechtliche Grundlage
-Die Hausregeln sind an den Mietvertrag gekoppelt und bei Nichteinhaltung der Hausregeln behält sich der Vermieter das Recht vor, den Mietvertrag aufzulösen oder Vertragsstrafen zu erheben.
+Die Hausregeln sind an den Mietvertrag gekoppelt und verpflichtend einzuhalten.
 
 ### b) Geltungsbereich
 Alle Gäste (und Besucher) müssen den Hausregeln und weiteren Anweisungen des Vermieters folgen.
@@ -567,7 +583,7 @@ ${einheitlicheRegeln.kinderGeeignet
 In der Zeit von **${einheitlicheRegeln.nachtruheVon} Uhr bis ${einheitlicheRegeln.nachtruheBis} Uhr** gilt Nachtruhe im Gebäude. Zu dieser Zeit gilt es sich ruhig zu verhalten, keinen starken Lärm zu verursachen und auf andere Gäste Rücksicht zu nehmen.
 
 ### b) Lärmschutz
-Übermäßiger Lärm und Partys sind zu jeder Tages- und Nachtzeit untersagt und können dazu führen, dass der Mietvertrag gekündigt wird, dass die Ferienwohnung verlassen werden muss und dass ggf. zusätzliche Kosten anfallen.
+Übermäßiger Lärm und Partys sind zu jeder Tages- und Nachtzeit untersagt.
 
 ### c) Nachbarschaftsrespekt
 Wir bitten unsere Gäste und ihre Besucher um einen respektvollen Umgang mit den Anwohnern und Nachbarn.
@@ -750,11 +766,8 @@ Bitte duschen Sie sich, bevor Sie den Pool betreten.
 ### a) Rauchregeln
 Das Rauchen ist ${einheitlicheRegeln.rauchenErlaubt ? 'in den Ferienwohnungen erlaubt' : 'in den Ferienwohnungen nicht erlaubt'}${!einheitlicheRegeln.rauchenErlaubt && einheitlicheRegeln.rauchenBalkonErlaubt ? ', jedoch auf Balkonen/Terrassen gestattet' : ''}.
 
-### b) Vertragsstrafe
-Bei Verstoß gegen das Rauchverbot wird eine Vertragsstrafe von **500€** für die erforderliche Sonderreinigung erhoben. Dies erfolgt zusätzlich zu eventuellen Schadensersatzforderungen.
-
-### c) Entsorgung
-Zigarettenstummel müssen ordnungsgemäß entsorgt werden und dürfen nicht auf das Grundstück geworfen werden. Nichtbeachtung führt zu einer Reinigungsgebühr von 50€.
+### b) Entsorgung
+Zigarettenstummel müssen ordnungsgemäß entsorgt werden und dürfen nicht auf das Grundstück geworfen werden.
 
 ## 🐕 Haustiere
 
@@ -764,11 +777,9 @@ Haustiere sind ${einheitlicheRegeln.haustiereErlaubt ? 'in den Ferienwohnungen e
 ${einheitlicheRegeln.haustiereErlaubt ? `### b) Regeln für Haustiere
 - Haustiere müssen jederzeit beaufsichtigt werden
 - Schäden durch Haustiere gehen zu Lasten des Gastes
-- Zusätzliche Reinigungsgebühr kann anfallen
 
 ### c) Besondere Hunderegeln
 - Hunde dürfen nicht im Bett oder auf der Couch aufgehalten werden
-- Bei Nichtbeachtung kann eine zusätzliche Reinigungsgebühr anfallen
 
 ### d) Hundegebühren
 ${globalSettings.hundegebuehrUnterschiedlich ? 
@@ -794,9 +805,6 @@ Fotoshootings, Videodrehs oder ähnliche kommerzielle Produktionen sind nur mit 
 ### c) Verbotene Aktivitäten
 Prostitution und damit verbundene Aktivitäten sind in den Räumlichkeiten strengstens verboten.
 
-### d) Vertragsstrafe
-Bei Verstoß gegen diese Regelungen wird eine Vertragsstrafe von **500€** erhoben. Dies erfolgt zusätzlich zu eventuellen Schadensersatzforderungen.
-
 ## 📶 WLAN
 
 ### a) Nutzungsbedingungen
@@ -809,9 +817,6 @@ Den Gästen wird kostenfreier WLAN-Zugang zur Verfügung gestellt. Die Nutzung u
 
 ### c) Haftung
 Der Gast haftet vollumfänglich für alle Kosten, Schäden und rechtlichen Konsequenzen, die durch Rechtsverstöße bei der Internetnutzung entstehen. Dies umfasst Abmahngebühren, Anwaltskosten und Schadensersatzforderungen.
-
-### d) Sperrung
-Bei Missbrauch behält sich der Vermieter das Recht vor, den WLAN-Zugang für den Gast zu sperren.
 
 ## 🔍 Überwachung & Datenschutz
 
@@ -857,20 +862,39 @@ Schlüssel und Zugangscodes sind streng vertraulich zu behandeln und dürfen unt
 ### e) Verlust von Schlüsseln
 Bei Schlüsselverlust werden Kosten für Schlüsseldienst, Schlosswechsel und neue Schlüssel dem Gast in Rechnung gestellt. Schlüssel dürfen nicht unbeaufsichtigt gelassen werden.
 
-### f) Sofortige Sperrung
-Bei schwerwiegenden Schäden oder Diebstahl behält sich der Vermieter das Recht vor, den Mietvertrag sofort zu kündigen und die Räumung der Wohnung zu verlangen.
-
 ## 🆘 Notfallinformationen
 
 ### a) Notfallkontakt
 Im Falle eines Notfalls können Sie den Vermieter wie folgt erreichen:
 
-**Name:** ${einheitlicheRegeln.vermieeterName}  
+**Name:** ${einheitlicheRegeln.vermieeterName}
 **Telefon:** ${einheitlicheRegeln.vermieterTelefon}
 
-## ✅ Einverständnis
+## ⚖️ Vertragsstrafen und Konsequenzen
 
-Eine Verletzung dieser Hausordnung verstößt gegen die Mietbedingungen gemäß Mietvertrag. Der Vermieter behält sich das Recht vor, den Mietvertrag zu beenden und Gäste, die sich weigern, die Hausordnung zu befolgen, aus der Wohnung zu verweisen.
+Bei Verstößen gegen die Hausordnung können folgende Maßnahmen ergriffen werden:
+
+### a) Vertragsstrafen
+- **Rauchen in Nichtraucherwohnungen:** Vertragsstrafe von 500€ für die erforderliche Sonderreinigung
+- **Lärmbelästigung/Partys:** Vertragsstrafe von 500€
+- **Gewerbliche Nutzung ohne Genehmigung:** Vertragsstrafe von 500€
+
+### b) Zusätzliche Gebühren
+- **Verspätete Abreise:** Aufpreis bei Überschreitung der Check-out-Zeit
+- **Nicht angemeldete Gäste:** Aufpreis pro zusätzlicher Person oder sofortige Kündigung
+- **Unsachgemäße Müllentsorgung:** Reinigungsgebühr von 50€
+- **Schäden durch Haustiere:** Zusätzliche Reinigungsgebühren
+
+### c) Vertragskündigung
+Bei schwerwiegenden Verstößen (Diebstahl, erhebliche Schäden, wiederholte Nichteinhaltung) behält sich der Vermieter das Recht vor, den Mietvertrag sofort zu kündigen und die Räumung der Wohnung zu verlangen.
+
+---
+
+Wir wünschen Ihnen einen angenehmen Aufenthalt und freuen uns, Sie als Gast begrüßen zu dürfen!
+
+Bei Fragen oder Anliegen stehen wir Ihnen jederzeit gerne zur Verfügung.
+
+**Ihr ${einheitlicheRegeln.vermieeterName} Team**
 `;
 
     return output;
