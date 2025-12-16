@@ -522,7 +522,7 @@ In case of violations of the house rules, the following measures may be taken:
 - **Damage caused by pets:** Additional cleaning fees
 
 ### c) Contract Termination
-In case of serious violations (theft, significant damage, repeated non-compliance), the landlord reserves the right to immediately terminate the rental agreement and demand evacuation of the apartment.
+In case of serious violations (theft, significant damage, repeated non-compliance), the rental agreement may be terminated.
 
 ---
 
@@ -556,7 +556,7 @@ ${einheitlicheRegeln.meldebescheinigungErforderlich ? '**Wichtiger Hinweis:** Ei
 Bei der Abreise bitten wir unsere Gäste, die Unterkunft bis spätestens **${einheitlicheRegeln.checkoutBis} Uhr** freizugeben.
 
 ### c) Verspätungen
-Bitte halten Sie die vereinbarten Check-in- und Check-out-Zeiten ein.
+Bitte halte die vereinbarten Check-in- und Check-out-Zeiten ein.
 
 ### d) Check-out Pflichten
 ${einheitlicheRegeln.checkoutPflichten}
@@ -688,7 +688,7 @@ Der Pool darf nur in der Zeit von **08:00 Uhr bis 22:00 Uhr** benutzt werden.
 Aus Sicherheitsgründen ist es nicht erlaubt, Gläser in oder um den Poolbereich herum zu benutzen. Die Nichteinhaltung dieser Regel führt zu einer Geldbuße.
 
 ### d) Hygiene
-Bitte duschen Sie sich, bevor Sie den Pool betreten.
+Bitte dusche dich, bevor du den Pool betrittst.
 
 `;
     }
@@ -841,7 +841,7 @@ In folgenden Gemeinschaftsbereichen sind Überwachungskameras installiert: **${g
 - Bei berechtigtem Interesse können Aufnahmen eingesehen werden` : ''}
 
 ### ${['b', 'c', 'd', 'e'][(globalSettings.lautstaerkemessung ? 1 : 0) + (globalSettings.rauchdetektoren ? 1 : 0) + (globalSettings.kameras_gemeinschaftsbereiche ? 1 : 0)]}) Datenschutzrechte
-Gäste haben das Recht auf Auskunft, Berichtigung und Löschung ihrer personenbezogenen Daten gemäß DSGVO. Bei Fragen zum Datenschutz wenden Sie sich bitte an den Vermieter.
+Du hast das Recht auf Auskunft, Berichtigung und Löschung deiner personenbezogenen Daten gemäß DSGVO. Bei Fragen zum Datenschutz wende dich bitte an den Vermieter.
 
 ## 🛠️ Schäden & Diebstahl
 
@@ -865,7 +865,7 @@ Bei Schlüsselverlust werden Kosten für Schlüsseldienst, Schlosswechsel und ne
 ## 🆘 Notfallinformationen
 
 ### a) Notfallkontakt
-Im Falle eines Notfalls können Sie den Vermieter wie folgt erreichen:
+Im Falle eines Notfalls kannst du den Vermieter wie folgt erreichen:
 
 **Name:** ${einheitlicheRegeln.vermieeterName}
 **Telefon:** ${einheitlicheRegeln.vermieterTelefon}
@@ -886,15 +886,15 @@ Bei Verstößen gegen die Hausordnung können folgende Maßnahmen ergriffen werd
 - **Schäden durch Haustiere:** Zusätzliche Reinigungsgebühren
 
 ### c) Vertragskündigung
-Bei schwerwiegenden Verstößen (Diebstahl, erhebliche Schäden, wiederholte Nichteinhaltung) behält sich der Vermieter das Recht vor, den Mietvertrag sofort zu kündigen und die Räumung der Wohnung zu verlangen.
+Bei schwerwiegenden Verstößen (Diebstahl, erhebliche Schäden, wiederholte Nichteinhaltung) kann der Mietvertrag gekündigt werden.
 
 ---
 
-Wir wünschen Ihnen einen angenehmen Aufenthalt und freuen uns, Sie als Gast begrüßen zu dürfen!
+Wir wünschen dir einen angenehmen Aufenthalt und freuen uns, dass du bei uns zuhause bist!
 
-Bei Fragen oder Anliegen stehen wir Ihnen jederzeit gerne zur Verfügung.
+Falls du Fragen hast, melde dich jederzeit gerne bei uns.
 
-**Ihr ${einheitlicheRegeln.vermieeterName} Team**
+**Dein ${einheitlicheRegeln.vermieeterName} Team**
 `;
 
     return output;
@@ -1759,8 +1759,8 @@ Bei Fragen oder Anliegen stehen wir Ihnen jederzeit gerne zur Verfügung.
                   <textarea
                     value={language === 'de' ? einheitlicheRegeln.checkoutPflichten : einheitlicheRegeln.checkoutPflichten_en}
                     onChange={(e) => updateEinheitlich(language === 'de' ? 'checkoutPflichten' : 'checkoutPflichten_en', e.target.value)}
-                    placeholder={language === 'de' 
-                      ? "Beschreiben Sie hier die Pflichten der Gäste bei der Abreise..." 
+                    placeholder={language === 'de'
+                      ? "Beschreibe hier die Pflichten der Gäste bei der Abreise..."
                       : "Describe the guests' duties upon departure..."}
                     style={{ 
                       padding: '12px', 
